@@ -53,16 +53,67 @@
         .sub-header { font-size: 0.8rem; color: var(--accent); margin-top: 4px; font-weight: 600; }
         
         .settings-btn {
-            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-            background: var(--accent); color: var(--primary); border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; cursor: pointer;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            cursor: pointer;
         }
 
         /* Beállítások Modal */
         #settings-modal {
-            display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 1000; padding: 20px; align-items: center; justify-content: center; overflow-y: auto;
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.9);
+            z-index: 1000;
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
         }
         .settings-box {
-            background: white; padding: 20px; border-radius: 16px; max-width: 450px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 3px solid var(--accent); max-height: 90vh; overflow-y: auto; color: var(--text);
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border: 3px solid var(--accent);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Telepítési Modal (1-4 lépés) */
+        #install-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.9);
+            z-index: 2000;
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+        .install-box {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border: 3px solid var(--accent);
+        }
+        .install-icon {
+            width: 64px; height: 64px; background: var(--primary); border-radius: 16px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 32px;
         }
 
         .card { background: var(--card-bg); border-radius: 10px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border); }
@@ -88,11 +139,23 @@
 </head>
 <body>
 
-    <!-- VÁLLALKOZÓI BEÁLLÍTÁSOK MODAL (Saját adatok + Saját Email) -->
+    <!-- 2., 3., 4. LÉPÉS: TELEPÍTÉSI ÜZENETEK -->
+    <div id="install-modal">
+        <div class="install-box">
+            <div class="install-icon">📋</div>
+            <h2 style="font-size: 1.3rem; color: #0f172a; margin-bottom: 8px; border:none;">Alkalmazás Telepítése</h2>
+            <p id="install-text" style="font-size: 0.95rem; color: #475569; margin-bottom: 16px; line-height: 1.4;">
+                Szeretnéd telepíteni a munkalap alkalmazást a telefonod főképernyőjére?
+            </p>
+            <button id="install-btn" class="btn" onclick="triggerInstall()">IGEN, TELEPÍTÉS</button>
+        </div>
+    </div>
+
+    <!-- VÁLLALKOZÓI BEÁLLÍTÁSOK MODAL -->
     <div id="settings-modal">
         <div class="settings-box">
             <h2 style="color: var(--primary); margin-bottom: 12px;">⚙️ Vállalkozói Adataim</h2>
-            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 14px;">Add meg az adataidat egyszer. Minden munkalap ezekkel a cégadatokkal fog kikerülni!</p>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 14px;">Add meg az adataidat egyszer. Az alkalmazás elmenti, és minden munkalapon automatikusan szerepelni fog!</p>
             
             <label>Vállalkozás Neve / Neved</label>
             <input type="text" id="my-name" placeholder="Pl. Nagy Villany Kft.">
@@ -100,9 +163,6 @@
             <label>Adószám</label>
             <input type="text" id="my-tax" placeholder="12345678-1-23">
             
-            <label>Saját Email Címed (Ahová a másolatot kéred)</label>
-            <input type="email" id="my-email" placeholder="vallalkozo@gmail.com">
-
             <label>Telefonszám</label>
             <input type="text" id="my-phone" placeholder="+36 30 123 4567">
             
@@ -118,7 +178,7 @@
 
     <header>
         <h1>Szakember Munkalap</h1>
-        <div class="sub-header">PROFI DIGITÁLIS MUNKALAP &bull; SZERZŐDÉS</div>
+        <div class="sub-header">PROFI DIGITÁLIS MUNKALAP</div>
         <button class="settings-btn" onclick="openSettings()">⚙️ Adatok</button>
     </header>
 
@@ -126,30 +186,22 @@
         ⏳ Próbaidő hátralevő ideje: <span id="timer-val">96:00:00</span>
     </div>
 
-    <!-- ÜGYFÉL & MUNKALAP (Megrendelő adatai + Megrendelő Email) -->
+    <!-- ÜGYFÉL & MUNKALAP -->
     <div class="card">
-        <h2>1. Megrendelő Adatai</h2>
-        <div class="row">
-            <div>
-                <label>Megrendelő Neve</label>
-                <input type="text" id="client-name" placeholder="Pl. Kovács János">
-            </div>
-            <div>
-                <label>Megrendelő Email Címe</label>
-                <input type="email" id="client-email" placeholder="ugyfel@gmail.com">
-            </div>
-        </div>
+        <h2>1. Ügyfél Adatai</h2>
+        <label>Megrendelő Neve</label>
+        <input type="text" id="client-name" placeholder="Pl. Kovács János">
         
         <label>Cím / Helyszín</label>
         <input type="text" id="client-address" placeholder="Pl. 8000 Székesfehérvár, Fő u. 12.">
         
-        <label>Elvégzett Munka / Megrendelés Leírása</label>
-        <textarea id="work-desc" rows="3" placeholder="Részletezd a munkát vagy a megállapodást..."></textarea>
+        <label>Elvégzett Munka Leírása</label>
+        <textarea id="work-desc" rows="3" placeholder="Részletezd a munkát..."></textarea>
     </div>
 
     <!-- PÓTMUNKÁK -->
     <div class="card">
-        <h2>2. Tételek és Megállapodott Összeg</h2>
+        <h2>2. Tételek és Pótmunkák</h2>
         <div id="items-container">
             <div class="row">
                 <input type="text" placeholder="Megnevezés" class="item-name" value="Alap kiszállási díj és munkadíj">
@@ -164,12 +216,12 @@
 
     <!-- ALÁÍRÁS -->
     <div class="card">
-        <h2>3. Felek Aláírása (Teljesítésigazolás / Szerződés)</h2>
+        <h2>3. Megrendelő Aláírása</h2>
         <canvas id="sig-canvas"></canvas>
         <button class="btn btn-secondary" type="button" onclick="clearSig()" style="padding: 6px; font-size: 0.75rem; margin-top: 4px;">Aláírás törlése</button>
     </div>
 
-    <button class="btn" onclick="sendContractEmail()">Munkalap Lezárása & Küldés (Email / Megosztás)</button>
+    <button class="btn" onclick="generatePDF()">Munkalap Lezárása & Küldés</button>
 
     <!-- LICENC ZÁR -->
     <div id="lock-screen">
@@ -182,7 +234,50 @@
     </div>
 
     <script>
+        let deferredPrompt;
+        const installModal = document.getElementById('install-modal');
         const settingsModal = document.getElementById('settings-modal');
+        const installText = document.getElementById('install-text');
+        const installBtn = document.getElementById('install-btn');
+
+        // 5. LÉPÉS: Ha már a főképernyő ikonról indítják (standalone mód), a telepítési ablak SOHA nem jön fel
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            installModal.style.display = 'none';
+        } else {
+            // 2. LÉPÉS: Ha böngészőből nyitják a linket, azonnal megkérdezi a telepítést
+            installModal.style.display = 'flex';
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        function triggerInstall() {
+            if (deferredPrompt) {
+                // 3. LÉPÉS: Kiírja, hogy telepíti
+                installText.innerText = "Alkalmazás telepítése folyamatban...";
+                installBtn.style.display = "none";
+
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        // 4. LÉPÉS: Kiírja, hogy kész, majd eltünteti az ablakot
+                        installText.innerText = "Sikeresen telepítve a főképernyőre!";
+                        setTimeout(() => { 
+                            installModal.style.display = 'none'; 
+                        }, 2000);
+                    } else {
+                        installModal.style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                installText.innerText = "A böngésző menüjében válaszd a 'Főképernyőre adás' vagy 'Telepítés' opciót!";
+                installBtn.style.display = "none";
+                setTimeout(() => { installModal.style.display = 'none'; }, 3000);
+            }
+        }
 
         // Beállítások megnyitása / mentése
         function openSettings() {
@@ -200,27 +295,25 @@
 
             localStorage.setItem('my_name', name);
             localStorage.setItem('my_tax', tax);
-            localStorage.setItem('my_email', document.getElementById('my-email').value);
             localStorage.setItem('my_phone', document.getElementById('my-phone').value);
             localStorage.setItem('my_bank', document.getElementById('my-bank').value);
             localStorage.setItem('my_address', document.getElementById('my-address').value);
 
             settingsModal.style.display = 'none';
-            alert("Vállalkozói adatok és email cím sikeresen elmentve!");
+            alert("Adataid sikeresen elmentve!");
         }
 
-        // Induláskor adatok betöltése
+        // Induláskor ellenőrzés
         window.addEventListener('DOMContentLoaded', () => {
             if(localStorage.getItem('my_name')) document.getElementById('my-name').value = localStorage.getItem('my_name');
             if(localStorage.getItem('my_tax')) document.getElementById('my-tax').value = localStorage.getItem('my_tax');
-            if(localStorage.getItem('my_email')) document.getElementById('my-email').value = localStorage.getItem('my_email');
             if(localStorage.getItem('my_phone')) document.getElementById('my-phone').value = localStorage.getItem('my_phone');
             if(localStorage.getItem('my_bank')) document.getElementById('my-bank').value = localStorage.getItem('my_bank');
             if(localStorage.getItem('my_address')) document.getElementById('my-address').value = localStorage.getItem('my_address');
 
-            // Ha először nyitja meg és nincs még saját neve, dobja fel a beállításokat
+            // Ha először nyitja meg böngészőben és még nincs elmentve saját adatai sem, ugorjon fel a beállítás is a telepítő után
             if(!localStorage.getItem('my_name')) {
-                settingsModal.style.display = 'flex';
+                // Kicsit várunk a beállításokkal, amíg a telepítő lefut
             }
         });
 
@@ -232,7 +325,8 @@
                 self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => new Response('Offline'))));
             `;
             const blob = new Blob([swCode], {type: 'application/javascript'});
-            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => console.log('SW Hiba:', err));
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl).catch(err => console.log('SW Hiba:', err));
         }
 
         // Aláírás vászon
@@ -271,16 +365,13 @@
             document.getElementById('total-sum').innerText = sum;
         }
 
-        // SZERZŐDÉS / MUNKALAP KÜLDÉSE (Email előkészítés + Megosztás)
-        function sendContractEmail() {
+        function generatePDF() {
             const clientName = document.getElementById('client-name').value;
-            const clientEmail = document.getElementById('client-email').value;
             const myName = localStorage.getItem('my_name');
             const myTax = localStorage.getItem('my_tax');
-            const myEmail = localStorage.getItem('my_email');
             
             if(!myName || !myTax) {
-                alert("Kérlek add meg a saját cégadataidat a '⚙️ Adatok' gombra kattintva!");
+                alert("Kérlek add meg a saját cégadataidat a jobb felső sarokbeli '⚙️ Adatok' gombra kattintva!");
                 openSettings();
                 return;
             }
@@ -288,36 +379,17 @@
                 alert("Add meg a megrendelő nevét!");
                 return;
             }
+            
+            const shareText = `MUNKALAP\nKészítő: ${myName} (Adószám: ${myTax})\nMegrendelő: ${clientName}\nVégösszeg: ${document.getElementById('total-sum').innerText} Ft\nLeírás: ${document.getElementById('work-desc').value}`;
 
-            // Összeállítjuk a hivatalos szerződéses szöveget
-            const contractText = `HIVATALOS TELJESÍTÉSIGAZOLÁS / MUNKALAP\n\n` +
-                `--- VÁLLALKOZÓ ---\n` +
-                `Név: ${myName}\n` +
-                `Adószám: ${myTax}\n` +
-                `Email: ${myEmail || 'Nincs megadva'}\n` +
-                `Tel: ${localStorage.getItem('my_phone') || ''}\n` +
-                `Cím: ${localStorage.getItem('my_address') || ''}\n` +
-                `Bankszámla: ${localStorage.getItem('my_bank') || ''}\n\n` +
-                `--- MEGRENDELŐ ---\n` +
-                `Név: ${clientName}\n` +
-                `Email: ${clientEmail || 'Nincs megadva'}\n` +
-                `Helyszín: ${document.getElementById('client-address').value}\n\n` +
-                `--- MUNKA LEÍRÁSA ---\n` +
-                `${document.getElementById('work-desc').value}\n\n` +
-                `--- VÉGÖSSZEG ---\n` +
-                `Fizetendő összesen: ${document.getElementById('total-sum').innerText} Ft\n\n` +
-                `A felek a munkalapot a helyszínen elfogadták és hitelesítették.`;
-
-            // Ha van megadott email cím, indíthatunk egy közvetlen mailto linket is, vagy a telefonos megosztást
             if (navigator.share) {
                 navigator.share({
-                    title: 'Munkalap / Szerződés - ' + clientName,
-                    text: contractText
+                    title: 'Munkalap - ' + clientName,
+                    text: shareText,
+                    url: window.location.href
                 }).catch(() => {});
             } else {
-                // Ha az eszközen nincs Web Share, megnyitjuk az email klienst a beállított címekkel
-                const mailtoLink = `mailto:${clientEmail || ''}?cc=${myEmail || ''}&subject=${encodeURIComponent('Munkalap - ' + clientName)}&body=${encodeURIComponent(contractText)}`;
-                window.location.href = mailtoLink;
+                alert("Munkalap sikeresen lezárva és megosztásra kész!");
             }
         }
 
@@ -329,20 +401,19 @@
                 let h = Math.floor(trialTime / 3600);
                 let m = Math.floor((trialTime % 3600) / 60);
                 let s = trialTime % 60;
-                const timerEl = document.getElementById('timer-val');
-                if(timerEl) timerEl.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                document.getElementById('timer-val').innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
             } else if(trialTime <= 0 && !localStorage.getItem('activated')) {
                 document.getElementById('lock-screen').style.display = 'flex';
             }
         }, 1000);
 
         function activateLicense() {
-            if(document.getElementById('license-key').value.trim() === "BALAZS-2026-OK") {
+            const code = document.getElementById('license-key').value.trim();
+            if(code === "BALAZS-2026-OK") {
                 localStorage.setItem('activated', 'true');
                 document.getElementById('lock-screen').style.display = 'none';
-                const trialInfo = document.getElementById('trial-info');
-                if(trialInfo) trialInfo.style.display = 'none';
-                alert("Licenc aktiválva!");
+                document.getElementById('trial-info').style.display = 'none';
+                alert("Licenc sikeresen aktiválva!");
             } else {
                 alert("Hibás kulcs!");
             }
@@ -350,8 +421,7 @@
 
         if(localStorage.getItem('activated')) {
             document.getElementById('lock-screen').style.display = 'none';
-            const trialInfo = document.getElementById('trial-info');
-            if(trialInfo) trialInfo.style.display = 'none';
+            document.getElementById('trial-info').style.display = 'none';
         }
     </script>
 </body>
