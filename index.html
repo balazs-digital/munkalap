@@ -57,6 +57,7 @@
             background: var(--accent); color: var(--primary); border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; cursor: pointer;
         }
 
+        /* Beállítások Modal */
         #settings-modal {
             display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 1000; padding: 20px; align-items: center; justify-content: center; overflow-y: auto;
         }
@@ -87,7 +88,7 @@
 </head>
 <body>
 
-    <!-- VÁLLALKOZÓI BEÁLLÍTÁSOK MODAL -->
+    <!-- VÁLLALKOZÓI BEÁLLÍTÁSOK MODAL (Saját adatok + Saját Email) -->
     <div id="settings-modal">
         <div class="settings-box">
             <h2 style="color: var(--primary); margin-bottom: 12px;">⚙️ Vállalkozói Adataim</h2>
@@ -99,7 +100,7 @@
             <label>Adószám</label>
             <input type="text" id="my-tax" placeholder="12345678-1-23">
             
-            <label>Saját Email Címed (Ahová a másolatot kapod)</label>
+            <label>Saját Email Címed (Ahová a másolatot kéred)</label>
             <input type="email" id="my-email" placeholder="vallalkozo@gmail.com">
 
             <label>Telefonszám</label>
@@ -125,7 +126,7 @@
         ⏳ Próbaidő hátralevő ideje: <span id="timer-val">96:00:00</span>
     </div>
 
-    <!-- ÜGYFÉL & MUNKALAP (1. Űrlap rész) -->
+    <!-- ÜGYFÉL & MUNKALAP (Megrendelő adatai + Megrendelő Email) -->
     <div class="card">
         <h2>1. Megrendelő Adatai</h2>
         <div class="row">
@@ -146,7 +147,7 @@
         <textarea id="work-desc" rows="3" placeholder="Részletezd a munkát vagy a megállapodást..."></textarea>
     </div>
 
-    <!-- TÉTELEK (2. Űrlap rész) -->
+    <!-- PÓTMUNKÁK -->
     <div class="card">
         <h2>2. Tételek és Megállapodott Összeg</h2>
         <div id="items-container">
@@ -161,15 +162,14 @@
         </div>
     </div>
 
-    <!-- ALÁÍRÁS (3. Űrlap rész) -->
+    <!-- ALÁÍRÁS -->
     <div class="card">
-        <h2>3. Felek Aláírása</h2>
+        <h2>3. Felek Aláírása (Teljesítésigazolás / Szerződés)</h2>
         <canvas id="sig-canvas"></canvas>
         <button class="btn btn-secondary" type="button" onclick="clearSig()" style="padding: 6px; font-size: 0.75rem; margin-top: 4px;">Aláírás törlése</button>
     </div>
 
-    <!-- ELFOGADOM ÉS KÜLDÉS GOMB -->
-    <button class="btn" onclick="acceptAndSendContract()">ELFOGADOM ÉS MUNKALAP KÜLDÉSE</button>
+    <button class="btn" onclick="sendContractEmail()">Munkalap Lezárása & Küldés (Email / Megosztás)</button>
 
     <!-- LICENC ZÁR -->
     <div id="lock-screen">
@@ -184,6 +184,7 @@
     <script>
         const settingsModal = document.getElementById('settings-modal');
 
+        // Beállítások megnyitása / mentése
         function openSettings() {
             settingsModal.style.display = 'flex';
         }
@@ -205,9 +206,10 @@
             localStorage.setItem('my_address', document.getElementById('my-address').value);
 
             settingsModal.style.display = 'none';
-            alert("Vállalkozói adatok és saját email cím sikeresen elmentve!");
+            alert("Vállalkozói adatok és email cím sikeresen elmentve!");
         }
 
+        // Induláskor adatok betöltése
         window.addEventListener('DOMContentLoaded', () => {
             if(localStorage.getItem('my_name')) document.getElementById('my-name').value = localStorage.getItem('my_name');
             if(localStorage.getItem('my_tax')) document.getElementById('my-tax').value = localStorage.getItem('my_tax');
@@ -216,6 +218,7 @@
             if(localStorage.getItem('my_bank')) document.getElementById('my-bank').value = localStorage.getItem('my_bank');
             if(localStorage.getItem('my_address')) document.getElementById('my-address').value = localStorage.getItem('my_address');
 
+            // Ha először nyitja meg és nincs még saját neve, dobja fel a beállításokat
             if(!localStorage.getItem('my_name')) {
                 settingsModal.style.display = 'flex';
             }
@@ -268,8 +271,8 @@
             document.getElementById('total-sum').innerText = sum;
         }
 
-        // ELFOGADOM ÉS AUTOMATIKUS LEVELEZŐ MEGNYITÁS
-        function acceptAndSendContract() {
+        // SZERZŐDÉS / MUNKALAP KÜLDÉSE (Email előkészítés + Megosztás)
+        function sendContractEmail() {
             const clientName = document.getElementById('client-name').value;
             const clientEmail = document.getElementById('client-email').value;
             const myName = localStorage.getItem('my_name');
@@ -286,6 +289,7 @@
                 return;
             }
 
+            // Összeállítjuk a hivatalos szerződéses szöveget
             const contractText = `HIVATALOS TELJESÍTÉSIGAZOLÁS / MUNKALAP\n\n` +
                 `--- VÁLLALKOZÓ ---\n` +
                 `Név: ${myName}\n` +
@@ -304,9 +308,17 @@
                 `Fizetendő összesen: ${document.getElementById('total-sum').innerText} Ft\n\n` +
                 `A felek a munkalapot a helyszínen elfogadták és hitelesítették.`;
 
-            // Automatikusan megnyitja a levelezőt a megadott címzettel (ügyfél) és a saját másolatoddal (CC)
-            const mailtoUrl = `mailto:${clientEmail || ''}?cc=${myEmail || ''}&subject=${encodeURIComponent('Munkalap és Szerződés - ' + clientName)}&body=${encodeURIComponent(contractText)}`;
-            window.location.href = mailtoUrl;
+            // Ha van megadott email cím, indíthatunk egy közvetlen mailto linket is, vagy a telefonos megosztást
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Munkalap / Szerződés - ' + clientName,
+                    text: contractText
+                }).catch(() => {});
+            } else {
+                // Ha az eszközen nincs Web Share, megnyitjuk az email klienst a beállított címekkel
+                const mailtoLink = `mailto:${clientEmail || ''}?cc=${myEmail || ''}&subject=${encodeURIComponent('Munkalap - ' + clientName)}&body=${encodeURIComponent(contractText)}`;
+                window.location.href = mailtoLink;
+            }
         }
 
         // Licenc ellenőrzés
