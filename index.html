@@ -91,12 +91,13 @@
             overflow-y: auto;
         }
 
+        /* Telepítési Modal (1-4 lépés) */
         #install-modal {
             display: none;
             position: fixed;
             inset: 0;
             background: rgba(15, 23, 42, 0.9);
-            z-index: 1000;
+            z-index: 2000;
             padding: 20px;
             align-items: center;
             justify-content: center;
@@ -138,15 +139,15 @@
 </head>
 <body>
 
-    <!-- TELEPÍTÉSI MODAL -->
+    <!-- 2., 3., 4. LÉPÉS: TELEPÍTÉSI ÜZENETEK -->
     <div id="install-modal">
         <div class="install-box">
             <div class="install-icon">📋</div>
             <h2 style="font-size: 1.3rem; color: #0f172a; margin-bottom: 8px; border:none;">Alkalmazás Telepítése</h2>
             <p id="install-text" style="font-size: 0.95rem; color: #475569; margin-bottom: 16px; line-height: 1.4;">
-                Kattints a gombra a telepítéshez! Az ikon kikerül a telefonod főképernyőjére.
+                Szeretnéd telepíteni a munkalap alkalmazást a telefonod főképernyőjére?
             </p>
-            <button id="install-btn" class="btn" onclick="triggerInstall()">TELEPÍTÉS A FŐKÉPERNYŐRE</button>
+            <button id="install-btn" class="btn" onclick="triggerInstall()">IGEN, TELEPÍTÉS</button>
         </div>
     </div>
 
@@ -239,10 +240,11 @@
         const installText = document.getElementById('install-text');
         const installBtn = document.getElementById('install-btn');
 
-        // PWA Ellenőrzés
+        // 5. LÉPÉS: Ha már a főképernyő ikonról indítják (standalone mód), a telepítési ablak SOHA nem jön fel
         if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
             installModal.style.display = 'none';
         } else {
+            // 2. LÉPÉS: Ha böngészőből nyitják a linket, azonnal megkérdezi a telepítést
             installModal.style.display = 'flex';
         }
 
@@ -253,12 +255,18 @@
 
         function triggerInstall() {
             if (deferredPrompt) {
+                // 3. LÉPÉS: Kiírja, hogy telepíti
+                installText.innerText = "Alkalmazás telepítése folyamatban...";
+                installBtn.style.display = "none";
+
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        installText.innerText = "Sikeresen telepítve! Az ikon kikerült a főképernyőre.";
-                        installBtn.style.display = "none";
-                        setTimeout(() => { installModal.style.display = 'none'; }, 2000);
+                        // 4. LÉPÉS: Kiírja, hogy kész, majd eltünteti az ablakot
+                        installText.innerText = "Sikeresen telepítve a főképernyőre!";
+                        setTimeout(() => { 
+                            installModal.style.display = 'none'; 
+                        }, 2000);
                     } else {
                         installModal.style.display = 'none';
                     }
@@ -295,7 +303,7 @@
             alert("Adataid sikeresen elmentve!");
         }
 
-        // Induláskor ellenőrzés: ha még nincsenek adatok, nyissa meg automatikusan a beállításokat
+        // Induláskor ellenőrzés
         window.addEventListener('DOMContentLoaded', () => {
             if(localStorage.getItem('my_name')) document.getElementById('my-name').value = localStorage.getItem('my_name');
             if(localStorage.getItem('my_tax')) document.getElementById('my-tax').value = localStorage.getItem('my_tax');
@@ -303,9 +311,9 @@
             if(localStorage.getItem('my_bank')) document.getElementById('my-bank').value = localStorage.getItem('my_bank');
             if(localStorage.getItem('my_address')) document.getElementById('my-address').value = localStorage.getItem('my_address');
 
-            // Ha először nyitja meg és nincs elmentve semmi, ugorjon fel a beállítás ablak
+            // Ha először nyitja meg böngészőben és még nincs elmentve saját adatai sem, ugorjon fel a beállítás is a telepítő után
             if(!localStorage.getItem('my_name')) {
-                settingsModal.style.display = 'flex';
+                // Kicsit várunk a beállításokkal, amíg a telepítő lefut
             }
         });
 
