@@ -64,7 +64,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 .status.ok{background:#e7f6ec;color:var(--ok)}
 .status.err{background:#fdecea;color:var(--err)}
 .big{font-size:30px;font-weight:800;color:var(--navy)}
-#inst{position:fixed;inset:0;z-index:70;background:#0b2447ee;display:flex;align-items:center;justify-content:center;padding:20px}
+#inst{position:fixed;inset:0;z-index:70;background:#0b2447;display:flex;align-items:center;justify-content:center;padding:20px}
 #inst .ib{background:#fff;border-radius:18px;border:3px solid var(--yellow);max-width:400px;width:100%;padding:24px;text-align:center}
 #inst .il{width:72px;height:72px;border-radius:18px;margin:0 auto 12px;display:block}
 #inst h2{margin:0 0 8px;font-size:21px;color:var(--navy)}
@@ -85,10 +85,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 </style>
 </head>
 <body>
+<div id="appRoot" hidden>
 <header class="top">
   <div class="brand"><span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#0b2447" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg></span>Munkalap</div>
   <span id="badge" class="badge" hidden></span>
-  <button id="instBtn" class="tbtn" type="button" hidden style="background:#ffc300;color:#0b2447;border-color:#ffc300">Telepítés</button>
   <button id="btnList" class="tbtn" type="button">Munkalapok</button>
   <button id="btnSettings" class="tbtn" type="button">Beállítások</button>
 </header>
@@ -222,6 +222,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
     <button id="settingsDone" class="btn dark" type="button">Mentés és vissza</button>
   </section>
 </main>
+</div>
 
 <div id="lock" hidden>
   <div class="box">
@@ -236,13 +237,15 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
     <p id="lkbuy" hidden style="margin-top:18px"></p>
   </div>
 </div>
-<div id="inst" hidden>
+<div id="inst">
   <div class="ib">
     <img class="il" src="icon-192.png" alt="">
-    <h2 id="instTitle">Alkalmazás telepítése</h2>
-    <p id="instText">Szeretnéd telepíteni az alkalmazást a főképernyőre?</p>
-    <button id="instYes" class="btn" type="button">IGEN, TELEPÍTÉS</button>
-    <button id="instNo" class="link" type="button">Most nem</button>
+    <h2 id="instTitle">Munkalap</h2>
+    <p id="instText">Egy pillanat...</p>
+    <div id="instNote" class="status ok" hidden style="margin:0 0 14px"></div>
+    <button id="instYes" class="btn" type="button" hidden>IGEN, TELEPÍTÉS</button>
+    <button id="instAlt" class="link" type="button" hidden></button>
+    <button id="instNo" class="link" type="button" hidden>Nem sikerül telepíteni, használom a böngészőben</button>
   </div>
 </div>
 <div id="toast" role="status"></div>
@@ -677,34 +680,45 @@ function toast(msg) { var t = $('toast'); t.textContent = msg; t.classList.add('
 function b64urlToBytes(s) { s = s.replace(/[\s]/g, '').replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; var bin = atob(s); var a = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); return a; }
 
 /* ====== telepítés és offline működés ====== */
-var deferred = null;
+var deferred = null, gateMode = false, promptSeen = false;
 function isStandalone() { try { return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true; } catch (e) { return false; } }
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }
-window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; var b = $('instBtn'); if (b && $('inst').hidden) b.hidden = false; });
-window.addEventListener('appinstalled', function () {
-  deferred = null; var b = $('instBtn'); if (b) b.hidden = true;
-  if (!$('inst').hidden) { $('instTitle').textContent = 'Kész!'; $('instText').textContent = 'Sikeresen telepítve! Keresd a főképernyőn a Munkalap ikont.'; $('instYes').hidden = true; $('instNo').hidden = true; setTimeout(function () { $('inst').hidden = true; }, 2600); }
-});
-function closeInst() { $('inst').hidden = true; try { sessionStorage.setItem('mk_inst_no', '1'); } catch (e) {} if (deferred) $('instBtn').hidden = false; }
-function startInstall() {
-  if (deferred) {
-    $('instTitle').textContent = 'Telepítés'; $('instText').textContent = 'Alkalmazás telepítése folyamatban...'; $('instYes').hidden = true; $('instNo').hidden = true;
-    var d = deferred; deferred = null;
-    d.prompt();
-    d.userChoice.then(function (c) {
-      if (c.outcome === 'accepted') { $('instTitle').textContent = 'Kész!'; $('instText').textContent = 'Sikeresen telepítve! Keresd a főképernyőn a Munkalap ikont.'; setTimeout(function () { $('inst').hidden = true; }, 2600); }
-      else { $('instTitle').textContent = 'Alkalmazás telepítése'; $('instText').textContent = 'Nem történt telepítés. Bármikor megteheted a Beállítások menüből vagy a böngésző menüjéből.'; setTimeout(function () { $('inst').hidden = true; }, 2600); }
-    }).catch(function () { $('inst').hidden = true; });
-  } else {
-    var ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    $('instTitle').textContent = 'Telepítés kézzel';
-    $('instText').textContent = ios ? 'Koppints a Safari alsó sávjában a Megosztás ikonra, majd a Főképernyőhöz adás menüpontra.' : 'Koppints a böngésző menüjére (három pont), majd a Telepítés vagy Hozzáadás a kezdőképernyőhöz menüpontra.';
-    $('instYes').hidden = true; $('instNo').textContent = 'Rendben';
-  }
+function gshow(title, text, yes, alt) {
+  $('instTitle').textContent = title; $('instText').textContent = text; $('instYes').hidden = !yes;
+  var a = $('instAlt'); a.hidden = !alt; if (alt) a.textContent = alt;
 }
-$('instYes').addEventListener('click', startInstall);
-$('instNo').addEventListener('click', closeInst);
-function maybeShowInst() { var no = false; try { no = sessionStorage.getItem('mk_inst_no') === '1'; } catch (e) {} if (!isStandalone() && !no && /^https?:$/.test(location.protocol)) $('inst').hidden = false; }
+function gateOffer() { gshow('Alkalmazás telepítése', 'Szeretnéd telepíteni az alkalmazást a főképernyőre?', true, ''); $('instNo').hidden = true; }
+function gateInstalled() { gshow('Az alkalmazás már telepítve van', 'Indítsd a főképernyőn a Munkalap ikonról. Ezt az ablakot bezárhatod.', false, 'Mégsem telepítve? Telepítés kézzel'); }
+function gateDone() { gshow('Sikeresen telepítve!', 'Zárd be ezt az ablakot, és indítsd az alkalmazást a főképernyőn a Munkalap ikonról.', false, ''); $('instNo').hidden = true; }
+function gateManual() {
+  var ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  gshow('Telepítés kézzel', ios ? 'Koppints a Safari alsó sávjában a Megosztás ikonra, majd a Főképernyőhöz adás menüpontra. Utána az ikonról indítsd az alkalmazást.' : 'Koppints a böngésző menüjére (három pont), majd a Telepítés vagy a Hozzáadás a kezdőképernyőhöz menüpontra. Utána az ikonról indítsd az alkalmazást.', false, '');
+  $('instNo').hidden = false;
+}
+window.addEventListener('beforeinstallprompt', function (e) {
+  e.preventDefault(); deferred = e; promptSeen = true; store.del('mk_installed');
+  if (gateMode) gateOffer();
+});
+window.addEventListener('appinstalled', function () { deferred = null; store.set('mk_installed', '1'); if (gateMode) gateDone(); });
+$('instYes').addEventListener('click', function () {
+  if (!deferred) { gateManual(); return; }
+  gshow('Telepítés', 'Alkalmazás telepítése folyamatban...', false, ''); $('instNo').hidden = true;
+  var d = deferred; deferred = null;
+  d.prompt();
+  d.userChoice.then(function (c) {
+    if (c.outcome === 'accepted') { setTimeout(function () { if ($('instTitle').textContent !== 'Sikeresen telepítve!') { store.set('mk_installed', '1'); gateDone(); } }, 3500); }
+    else { gshow('Nem történt telepítés', 'Az alkalmazás csak telepítve használható.', false, 'Telepítés újra'); promptSeen = false; }
+  }).catch(function () { gateManual(); });
+});
+$('instAlt').addEventListener('click', function () { if (deferred) { gateOffer(); } else { gateManual(); } });
+$('instNo').addEventListener('click', function () { startApp(); });
+function runGate() {
+  gateMode = true; $('inst').hidden = false; $('appRoot').hidden = true;
+  setTimeout(function () {
+    if (promptSeen) return;
+    if (store.get('mk_installed') === '1') gateInstalled(); else gateManual();
+  }, 2500);
+}
 
 /* ====== IndexedDB (második tároló a próbaidőhöz) ====== */
 var idb = null;
@@ -1031,7 +1045,9 @@ async function submitMail(to, fields, file) {
     var j = {}; try { j = await r.json(); } catch (e) {}
     clearTimeout(to_);
     if (r.ok && (j.success === true || j.success === 'true')) return { ok: true, msg: j.message || '' };
-    return { ok: false, msg: j.message || ('Hiba (' + r.status + ')') };
+    var raw = String(j.message || '');
+    if (/activat|confirm|verif/i.test(raw)) return { ok: false, act: true, msg: 'Az első küldésnél egyszeri megerősítés kell. Küldtünk egy levelet a megadott e-mail címedre (nézd meg a levélszemét mappát is). Nyisd meg, kattints benne a megerősítő gombra, utána nyomd meg újra a küldést.' };
+    return { ok: false, msg: 'A küldés most nem sikerült (' + r.status + '). Próbáld újra, vagy használd a Megosztás vagy a PDF letöltése gombot.' };
   } catch (e) { clearTimeout(to_); return { ok: false, msg: navigator.onLine ? 'A küldés nem sikerült (időtúllépés vagy hálózati hiba).' : 'Nincs internetkapcsolat.' }; }
 }
 function mailValid() { return /.+@.+\..+/.test(S.email || ''); }
@@ -1042,7 +1058,7 @@ $('sendMail').addEventListener('click', async function () {
     var p = getPdf(); var f = new File([p.blob], p.name, { type: 'application/pdf' });
     var res = await submitMail(S.email, { '_subject': 'Munkalap – ' + D.cname + ' – ' + money(p.total), 'Munkalap': p.id, 'Megrendelő': D.cname, 'Cím': D.caddr, 'Telefon': D.cphone, 'Megrendelő e-mail': D.cmail, 'Összesen': money(p.total), 'Munka': D.desc }, f);
     if (res.ok) setStatus('Elküldve ide: ' + S.email + '. Ha nem érkezik meg pár percen belül, nézd meg a levélszemét mappát, és az első küldésnél kattints a megerősítő levélben lévő linkre.', 'ok');
-    else setStatus('Nem sikerült elküldeni: ' + res.msg + ' Használd a Megosztás vagy a PDF letöltése gombot.', 'err');
+    else if (res.act) setStatus(res.msg, ''); else setStatus(res.msg, 'err');
   } catch (e) { setStatus('Hiba: ' + e.message, 'err'); }
   b.disabled = false;
 });
@@ -1051,31 +1067,41 @@ $('testMail').addEventListener('click', async function () {
   if (!mailValid()) { s.className = 'status err'; s.textContent = 'Előbb add meg az e-mail címedet.'; return; }
   s.textContent = 'Küldés...';
   var res = await submitMail(S.email, { '_subject': 'Munkalap – teszt', 'Üzenet': 'Ez egy teszt. Ha ezt látod, a küldés működik.' }, null);
-  if (res.ok) { s.className = 'status ok'; s.textContent = 'Elküldve. Nézd meg a leveleidet. Az első alkalommal egy megerősítő levelet kapsz, abban kattints a linkre.'; } else { s.className = 'status err'; s.textContent = 'Nem sikerült: ' + res.msg; }
+  if (res.ok) { s.className = 'status ok'; s.textContent = 'Elküldve. Nézd meg a leveleidet. Az első alkalommal egy megerősítő levelet kapsz, abban kattints a linkre.'; } else if (res.act) { s.className = 'status'; s.textContent = res.msg; } else { s.className = 'status err'; s.textContent = res.msg; }
 });
 
-$('instBtn').addEventListener('click', function () { $('inst').hidden = false; $('instYes').hidden = false; $('instNo').hidden = false; $('instNo').textContent = 'Most nem'; $('instTitle').textContent = 'Alkalmazás telepítése'; $('instText').textContent = 'Szeretnéd telepíteni az alkalmazást a főképernyőre?'; });
 /* ====== licenc beírás ====== */
 $('lkact').addEventListener('click', function () { activate($('lkmail').value, $('lkcode').value, $('lkerr')); });
 $('lact').addEventListener('click', function () { activate($('lmail').value, $('lcode').value, null); });
 
 /* ====== indulás ====== */
-(async function init() {
-  await idbOpen();
+var started = false;
+async function handleHash() {
   var h = location.hash ? new URLSearchParams(location.hash.slice(1)) : null;
   if (h && h.get('a') && h.get('e')) {
     var em = h.get('e'), cd = h.get('a');
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
     await evaluate();
     await activate(em, cd, null);
+    if (gateMode) { var n = $('instNote'); n.hidden = false; n.textContent = gate.licensed ? 'Licenc aktiválva: ' + gate.licEmail : 'Az aktiváló link nem érvényes.'; n.className = 'status ' + (gate.licensed ? 'ok' : 'err'); }
   }
+}
+async function startApp() {
+  if (started) return; started = true;
+  $('inst').hidden = true; $('appRoot').hidden = false; gateMode = false;
   await tick();
   fillForm(); fillSettings();
   setTimeout(sizeCanvas, 30);
-  maybeShowInst();
   if (!S.email) setTimeout(function () { toast('Első lépés: add meg a saját adataidat a Beállításokban.'); }, 600);
   setInterval(tick, 30000);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) tick(); });
+}
+(async function init() {
+  await idbOpen();
+  if (isStandalone() || !/^https?:$/.test(location.protocol)) {
+    if (isStandalone()) store.set('mk_installed', '1');
+    await handleHash(); await startApp();
+  } else { runGate(); await handleHash(); }
 })();
 })();
 </script>
