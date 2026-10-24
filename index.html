@@ -245,6 +245,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
     <div id="instNote" class="status ok" hidden style="margin:0 0 14px"></div>
     <button id="instYes" class="btn" type="button" hidden>IGEN, TELEPÍTÉS</button>
     <button id="instAlt" class="link" type="button" hidden></button>
+    <button id="instClose" class="btn dark" type="button" hidden style="margin-top:10px">BEZÁRÁS</button>
     <button id="instNo" class="link" type="button" hidden>Nem sikerül telepíteni, használom a böngészőben</button>
   </div>
 </div>
@@ -687,9 +688,9 @@ function gshow(title, text, yes, alt) {
   $('instTitle').textContent = title; $('instText').textContent = text; $('instYes').hidden = !yes;
   var a = $('instAlt'); a.hidden = !alt; if (alt) a.textContent = alt;
 }
-function gateOffer() { gshow('Alkalmazás telepítése', 'Szeretnéd telepíteni az alkalmazást a főképernyőre?', true, ''); $('instNo').hidden = true; }
-function gateInstalled() { gshow('Az alkalmazás már telepítve van', 'Indítsd a főképernyőn a Munkalap ikonról. Ezt az ablakot bezárhatod.', false, 'Mégsem telepítve? Telepítés kézzel'); }
-function gateDone() { gshow('Sikeresen telepítve!', 'Zárd be ezt az ablakot, és indítsd az alkalmazást a főképernyőn a Munkalap ikonról.', false, ''); $('instNo').hidden = true; }
+function gateOffer() { $('instClose').hidden = true; gshow('Alkalmazás telepítése', 'Szeretnéd telepíteni az alkalmazást a főképernyőre?', true, ''); $('instNo').hidden = true; }
+function gateInstalled() { gshow('Az alkalmazás már telepítve van', 'Indítsd a főképernyőn a Munkalap ikonról. Ezt az ablakot bezárhatod.', false, 'Mégsem telepítve? Telepítés kézzel'); $('instClose').hidden = false; }
+function gateDone() { gshow('Sikeresen telepítve!', 'Zárd be ezt az ablakot, és indítsd az alkalmazást a főképernyőn a Munkalap ikonról.', false, ''); $('instNo').hidden = true; $('instClose').hidden = false; }
 function gateManual() {
   var ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
   gshow('Telepítés kézzel', ios ? 'Koppints a Safari alsó sávjában a Megosztás ikonra, majd a Főképernyőhöz adás menüpontra. Utána az ikonról indítsd az alkalmazást.' : 'Koppints a böngésző menüjére (három pont), majd a Telepítés vagy a Hozzáadás a kezdőképernyőhöz menüpontra. Utána az ikonról indítsd az alkalmazást.', false, '');
@@ -712,6 +713,10 @@ $('instYes').addEventListener('click', function () {
 });
 $('instAlt').addEventListener('click', function () { if (deferred) { gateOffer(); } else { gateManual(); } });
 $('instNo').addEventListener('click', function () { startApp(); });
+$('instClose').addEventListener('click', function () {
+  try { window.close(); } catch (e) {}
+  setTimeout(function () { var n = $('instNote'); n.hidden = false; n.className = 'status'; n.textContent = 'A böngésző nem engedi, hogy az oldal bezárja önmagát. Nyomd meg a telefon Kezdőlap gombját (vagy húzd fel a képernyő aljáról), és koppints a főképernyőn a Munkalap ikonra.'; $('instClose').hidden = true; }, 400);
+});
 function runGate() {
   gateMode = true; $('inst').hidden = false; $('appRoot').hidden = true;
   setTimeout(function () {
