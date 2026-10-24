@@ -48,15 +48,54 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
         body { background: var(--bg); color: var(--text); padding: 12px; max-width: 600px; margin: 0 auto; padding-bottom: 80px; }
-        header { background: var(--primary); color: white; padding: 16px; border-radius: 12px; text-align: center; margin-bottom: 16px; border-bottom: 4px solid var(--accent); }
+        header { background: var(--primary); color: white; padding: 16px; border-radius: 12px; text-align: center; margin-bottom: 16px; border-bottom: 4px solid var(--accent); position: relative; }
         h1 { font-size: 1.25rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
         .sub-header { font-size: 0.8rem; color: var(--accent); margin-top: 4px; font-weight: 600; }
         
+        .settings-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        /* Beállítások Modal */
+        #settings-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.9);
+            z-index: 1000;
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+        }
+        .settings-box {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border: 3px solid var(--accent);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
         #install-modal {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(15, 23, 42, 0.9);
             z-index: 1000;
             padding: 20px;
             align-items: center;
@@ -99,59 +138,56 @@
 </head>
 <body>
 
-    <!-- FELUGRÓ TELEPÍTÉSI ABLAK -->
+    <!-- TELEPÍTÉSI MODAL -->
     <div id="install-modal">
         <div class="install-box">
             <div class="install-icon">📋</div>
-            <h2 style="font-size: 1.3rem; color: #0f172a; margin-bottom: 8px; border:none;">Telepítés a telefonra</h2>
-            <p style="font-size: 0.95rem; color: #475569; margin-bottom: 16px; line-height: 1.4;">
-                Az alkalmazás ikona kikerül a <strong>telefonod főképernyőjére</strong> a gyorsabb elérésért!
+            <h2 style="font-size: 1.3rem; color: #0f172a; margin-bottom: 8px; border:none;">Alkalmazás Telepítése</h2>
+            <p id="install-text" style="font-size: 0.95rem; color: #475569; margin-bottom: 16px; line-height: 1.4;">
+                Kattints a gombra a telepítéshez! Az ikon kikerül a telefonod főképernyőjére.
             </p>
-            <button class="btn" onclick="triggerInstall()">IGEN, TELEPÍTÉS</button>
-            <button class="btn btn-secondary" onclick="closeInstallModal()" style="background:#cbd5e1; color:#334155; font-size:0.85rem; padding:10px;">Már telepítettem / Később</button>
+            <button id="install-btn" class="btn" onclick="triggerInstall()">TELEPÍTÉS A FŐKÉPERNYŐRE</button>
+        </div>
+    </div>
+
+    <!-- VÁLLALKOZÓI BEÁLLÍTÁSOK MODAL -->
+    <div id="settings-modal">
+        <div class="settings-box">
+            <h2 style="color: var(--primary); margin-bottom: 12px;">⚙️ Vállalkozói Adataim</h2>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 14px;">Add meg az adataidat egyszer. Az alkalmazás elmenti, és minden munkalapon automatikusan szerepelni fog!</p>
+            
+            <label>Vállalkozás Neve / Neved</label>
+            <input type="text" id="my-name" placeholder="Pl. Nagy Villany Kft.">
+            
+            <label>Adószám</label>
+            <input type="text" id="my-tax" placeholder="12345678-1-23">
+            
+            <label>Telefonszám</label>
+            <input type="text" id="my-phone" placeholder="+36 30 123 4567">
+            
+            <label>Bankszámlaszám</label>
+            <input type="text" id="my-bank" placeholder="12012345-00123456-00100008">
+            
+            <label>Székhely / Cím</label>
+            <input type="text" id="my-address" placeholder="8000 Székesfehérvár, Kossuth u. 1.">
+
+            <button class="btn" onclick="saveSettings()">Mentés és Bezárás</button>
         </div>
     </div>
 
     <header>
         <h1>Szakember Munkalap</h1>
-        <div class="sub-header">PROFI DIGITÁLIS MUNKALAP &bull; 1 KATTINTÁS</div>
+        <div class="sub-header">PROFI DIGITÁLIS MUNKALAP</div>
+        <button class="settings-btn" onclick="openSettings()">⚙️ Adatok</button>
     </header>
 
     <div id="trial-info" class="trial-banner">
         ⏳ Próbaidő hátralevő ideje: <span id="timer-val">96:00:00</span>
     </div>
 
-    <!-- SAJÁT CÉGES / SZAKEMBER ADATOK (Automatikusan mentődik) -->
-    <div class="card" style="border: 2px solid var(--accent);">
-        <h2>⚙️ Saját Céges Adataim (Mentve marad)</h2>
-        <div class="row">
-            <div>
-                <label>Vállalkozás / Neved</label>
-                <input type="text" id="my-name" placeholder="Pl. Nagy Villany Kft." oninput="saveMyData()">
-            </div>
-            <div>
-                <label>Adószám</label>
-                <input type="text" id="my-tax" placeholder="12345678-1-23" oninput="saveMyData()">
-            </div>
-        </div>
-        
-        <div class="row">
-            <div>
-                <label>Telefonszám</label>
-                <input type="text" id="my-phone" placeholder="+36 30 123 4567" oninput="saveMyData()">
-            </div>
-            <div>
-                <label>Bankszámlaszám</label>
-                <input type="text" id="my-bank" placeholder="12012345-00123456-00100008" oninput="saveMyData()">
-            </div>
-        </div>
-        <label>Székhely / Cím</label>
-        <input type="text" id="my-address" placeholder="8000 Székesfehérvár, Kossuth u. 1." oninput="saveMyData()">
-    </div>
-
     <!-- ÜGYFÉL & MUNKALAP -->
     <div class="card">
-        <h2>1. Ügyfél és Adatok</h2>
+        <h2>1. Ügyfél Adatai</h2>
         <label>Megrendelő Neve</label>
         <input type="text" id="client-name" placeholder="Pl. Kovács János">
         
@@ -197,20 +233,22 @@
     </div>
 
     <script>
-        // PWA Automatikus telepítés kezelés
         let deferredPrompt;
         const installModal = document.getElementById('install-modal');
+        const settingsModal = document.getElementById('settings-modal');
+        const installText = document.getElementById('install-text');
+        const installBtn = document.getElementById('install-btn');
 
-        if (window.matchMedia('(display-mode: standalone)').matches || localStorage.getItem('pwa_installed') === 'true') {
+        // PWA Ellenőrzés
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
             installModal.style.display = 'none';
+        } else {
+            installModal.style.display = 'flex';
         }
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            if (!localStorage.getItem('pwa_installed')) {
-                installModal.style.display = 'flex';
-            }
         });
 
         function triggerInstall() {
@@ -218,37 +256,57 @@
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        localStorage.setItem('pwa_installed', 'true');
+                        installText.innerText = "Sikeresen telepítve! Az ikon kikerült a főképernyőre.";
+                        installBtn.style.display = "none";
+                        setTimeout(() => { installModal.style.display = 'none'; }, 2000);
+                    } else {
+                        installModal.style.display = 'none';
                     }
-                    installModal.style.display = 'none';
                     deferredPrompt = null;
                 });
             } else {
-                localStorage.setItem('pwa_installed', 'true');
-                installModal.style.display = 'none';
+                installText.innerText = "A böngésző menüjében válaszd a 'Főképernyőre adás' vagy 'Telepítés' opciót!";
+                installBtn.style.display = "none";
+                setTimeout(() => { installModal.style.display = 'none'; }, 3000);
             }
         }
 
-        function closeInstallModal() {
-            localStorage.setItem('pwa_installed', 'true');
-            installModal.style.display = 'none';
+        // Beállítások megnyitása / mentése
+        function openSettings() {
+            settingsModal.style.display = 'flex';
         }
 
-        // Saját adatok mentése LocalStorage-ba
-        function saveMyData() {
-            localStorage.setItem('my_name', document.getElementById('my-name').value);
-            localStorage.setItem('my_tax', document.getElementById('my-tax').value);
+        function saveSettings() {
+            const name = document.getElementById('my-name').value.trim();
+            const tax = document.getElementById('my-tax').value.trim();
+            
+            if(!name || !tax) {
+                alert("Legalább a nevet és az adószámot add meg!");
+                return;
+            }
+
+            localStorage.setItem('my_name', name);
+            localStorage.setItem('my_tax', tax);
             localStorage.setItem('my_phone', document.getElementById('my-phone').value);
             localStorage.setItem('my_bank', document.getElementById('my-bank').value);
             localStorage.setItem('my_address', document.getElementById('my-address').value);
+
+            settingsModal.style.display = 'none';
+            alert("Adataid sikeresen elmentve!");
         }
 
+        // Induláskor ellenőrzés: ha még nincsenek adatok, nyissa meg automatikusan a beállításokat
         window.addEventListener('DOMContentLoaded', () => {
             if(localStorage.getItem('my_name')) document.getElementById('my-name').value = localStorage.getItem('my_name');
             if(localStorage.getItem('my_tax')) document.getElementById('my-tax').value = localStorage.getItem('my_tax');
             if(localStorage.getItem('my_phone')) document.getElementById('my-phone').value = localStorage.getItem('my_phone');
             if(localStorage.getItem('my_bank')) document.getElementById('my-bank').value = localStorage.getItem('my_bank');
             if(localStorage.getItem('my_address')) document.getElementById('my-address').value = localStorage.getItem('my_address');
+
+            // Ha először nyitja meg és nincs elmentve semmi, ugorjon fel a beállítás ablak
+            if(!localStorage.getItem('my_name')) {
+                settingsModal.style.display = 'flex';
+            }
         });
 
         // Service Worker
@@ -300,23 +358,30 @@
         }
 
         function generatePDF() {
-            const name = document.getElementById('client-name').value;
-            const myName = document.getElementById('my-name').value;
-            const myTax = document.getElementById('my-tax').value;
+            const clientName = document.getElementById('client-name').value;
+            const myName = localStorage.getItem('my_name');
+            const myTax = localStorage.getItem('my_tax');
             
-            if(!myName || !myTax) { alert("Kérlek töltsd ki a 'Saját Céges Adataim' résznél a neved és az adószámot!"); return; }
-            if(!name) { alert("Add meg az ügyfél nevét!"); return; }
+            if(!myName || !myTax) {
+                alert("Kérlek add meg a saját cégadataidat a jobb felső sarokbeli '⚙️ Adatok' gombra kattintva!");
+                openSettings();
+                return;
+            }
+            if(!clientName) {
+                alert("Add meg a megrendelő nevét!");
+                return;
+            }
             
-            const shareText = `MUNKALAP\nKészítő: ${myName} (Adószám: ${myTax})\nMegrendelő: ${name}\nVégösszeg: ${document.getElementById('total-sum').innerText} Ft\nLeírás: ${document.getElementById('work-desc').value}`;
+            const shareText = `MUNKALAP\nKészítő: ${myName} (Adószám: ${myTax})\nMegrendelő: ${clientName}\nVégösszeg: ${document.getElementById('total-sum').innerText} Ft\nLeírás: ${document.getElementById('work-desc').value}`;
 
             if (navigator.share) {
                 navigator.share({
-                    title: 'Munkalap - ' + name,
+                    title: 'Munkalap - ' + clientName,
                     text: shareText,
                     url: window.location.href
                 }).catch(() => {});
             } else {
-                alert("Munkalap lezárva és összegölve!");
+                alert("Munkalap sikeresen lezárva és megosztásra kész!");
             }
         }
 
