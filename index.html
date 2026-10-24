@@ -47,70 +47,33 @@
             --border: #cbd5e1;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        body { background: var(--bg); color: var(--text); padding: 12px; max-width: 600px; margin: 0 auto; padding-bottom: 80px; }
+        
+        /* Alapértelmezésben elrejtjük a tartalmat, amíg a telepítés le nem fut vagy ki nem lépnek */
+        body { background: var(--primary); color: var(--text); padding: 12px; max-width: 600px; margin: 0 auto; padding-bottom: 80px; }
+        
+        #app-content { display: none; } /* Kezdetben rejtve van a munkalap, hogy neugorjon be */
+
         header { background: var(--primary); color: white; padding: 16px; border-radius: 12px; text-align: center; margin-bottom: 16px; border-bottom: 4px solid var(--accent); position: relative; }
         h1 { font-size: 1.25rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
         .sub-header { font-size: 0.8rem; color: var(--accent); margin-top: 4px; font-weight: 600; }
         
         .settings-btn {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--accent);
-            color: var(--primary);
-            border: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 0.8rem;
-            cursor: pointer;
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            background: var(--accent); color: var(--primary); border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; cursor: pointer;
         }
 
-        /* Beállítások Modal */
         #settings-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.9);
-            z-index: 1000;
-            padding: 20px;
-            align-items: center;
-            justify-content: center;
-            overflow-y: auto;
+            display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 1000; padding: 20px; align-items: center; justify-content: center; overflow-y: auto;
         }
         .settings-box {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            max-width: 450px;
-            width: 100%;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            border: 3px solid var(--accent);
-            max-height: 90vh;
-            overflow-y: auto;
+            background: white; padding: 20px; border-radius: 16px; max-width: 450px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 3px solid var(--accent); max-height: 90vh; overflow-y: auto; color: var(--text);
         }
 
-        /* Telepítési Modal (1-4 lépés) */
         #install-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.9);
-            z-index: 2000;
-            padding: 20px;
-            align-items: center;
-            justify-content: center;
+            display: flex; position: fixed; inset: 0; background: #0f172a; z-index: 2000; padding: 20px; align-items: center; justify-content: center;
         }
         .install-box {
-            background: white;
-            padding: 24px;
-            border-radius: 16px;
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            border: 3px solid var(--accent);
+            background: white; padding: 24px; border-radius: 16px; text-align: center; max-width: 400px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 3px solid var(--accent); color: var(--text);
         }
         .install-icon {
             width: 64px; height: 64px; background: var(--primary); border-radius: 16px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 32px;
@@ -139,7 +102,7 @@
 </head>
 <body>
 
-    <!-- 2., 3., 4. LÉPÉS: TELEPÍTÉSI ÜZENETEK -->
+    <!-- TELEPÍTÉSI LÉPÉSEK MODAL -->
     <div id="install-modal">
         <div class="install-box">
             <div class="install-icon">📋</div>
@@ -148,80 +111,84 @@
                 Szeretnéd telepíteni a munkalap alkalmazást a telefonod főképernyőjére?
             </p>
             <button id="install-btn" class="btn" onclick="triggerInstall()">IGEN, TELEPÍTÉS</button>
+            <button class="btn btn-secondary" onclick="skipInstall()" style="background:#cbd5e1; color:#334155; font-size:0.85rem; padding:10px; margin-top:8px;">Már telepítettem / Használat böngészőben</button>
         </div>
     </div>
 
-    <!-- VÁLLALKOZÓI BEÁLLÍTÁSOK MODAL -->
-    <div id="settings-modal">
-        <div class="settings-box">
-            <h2 style="color: var(--primary); margin-bottom: 12px;">⚙️ Vállalkozói Adataim</h2>
-            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 14px;">Add meg az adataidat egyszer. Az alkalmazás elmenti, és minden munkalapon automatikusan szerepelni fog!</p>
-            
-            <label>Vállalkozás Neve / Neved</label>
-            <input type="text" id="my-name" placeholder="Pl. Nagy Villany Kft.">
-            
-            <label>Adószám</label>
-            <input type="text" id="my-tax" placeholder="12345678-1-23">
-            
-            <label>Telefonszám</label>
-            <input type="text" id="my-phone" placeholder="+36 30 123 4567">
-            
-            <label>Bankszámlaszám</label>
-            <input type="text" id="my-bank" placeholder="12012345-00123456-00100008">
-            
-            <label>Székhely / Cím</label>
-            <input type="text" id="my-address" placeholder="8000 Székesfehérvár, Kossuth u. 1.">
+    <!-- VALÓDI APP TARTALOM (Csak akkor látszik, ha telepítve van vagy ha átlépték) -->
+    <div id="app-content">
+        <header>
+            <h1>Szakember Munkalap</h1>
+            <div class="sub-header">PROFI DIGITÁLIS MUNKALAP</div>
+            <button class="settings-btn" onclick="openSettings()">⚙️ Adatok</button>
+        </header>
 
-            <button class="btn" onclick="saveSettings()">Mentés és Bezárás</button>
+        <div id="trial-info" class="trial-banner">
+            ⏳ Próbaidő hátralevő ideje: <span id="timer-val">96:00:00</span>
         </div>
-    </div>
 
-    <header>
-        <h1>Szakember Munkalap</h1>
-        <div class="sub-header">PROFI DIGITÁLIS MUNKALAP</div>
-        <button class="settings-btn" onclick="openSettings()">⚙️ Adatok</button>
-    </header>
+        <!-- VÁLLALKOZÓI BEÁLLÍTÁSOK MODAL -->
+        <div id="settings-modal">
+            <div class="settings-box">
+                <h2 style="color: var(--primary); margin-bottom: 12px;">⚙️ Vállalkozói Adataim</h2>
+                <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 14px;">Add meg az adataidat egyszer. Az alkalmazás elmenti, és minden munkalapon automatikusan szerepelni fog!</p>
+                
+                <label>Vállalkozás Neve / Neved</label>
+                <input type="text" id="my-name" placeholder="Pl. Nagy Villany Kft.">
+                
+                <label>Adószám</label>
+                <input type="text" id="my-tax" placeholder="12345678-1-23">
+                
+                <label>Telefonszám</label>
+                <input type="text" id="my-phone" placeholder="+36 30 123 4567">
+                
+                <label>Bankszámlaszám</label>
+                <input type="text" id="my-bank" placeholder="12012345-00123456-00100008">
+                
+                <label>Székhely / Cím</label>
+                <input type="text" id="my-address" placeholder="8000 Székesfehérvár, Kossuth u. 1.">
 
-    <div id="trial-info" class="trial-banner">
-        ⏳ Próbaidő hátralevő ideje: <span id="timer-val">96:00:00</span>
-    </div>
-
-    <!-- ÜGYFÉL & MUNKALAP -->
-    <div class="card">
-        <h2>1. Ügyfél Adatai</h2>
-        <label>Megrendelő Neve</label>
-        <input type="text" id="client-name" placeholder="Pl. Kovács János">
-        
-        <label>Cím / Helyszín</label>
-        <input type="text" id="client-address" placeholder="Pl. 8000 Székesfehérvár, Fő u. 12.">
-        
-        <label>Elvégzett Munka Leírása</label>
-        <textarea id="work-desc" rows="3" placeholder="Részletezd a munkát..."></textarea>
-    </div>
-
-    <!-- PÓTMUNKÁK -->
-    <div class="card">
-        <h2>2. Tételek és Pótmunkák</h2>
-        <div id="items-container">
-            <div class="row">
-                <input type="text" placeholder="Megnevezés" class="item-name" value="Alap kiszállási díj és munkadíj">
-                <input type="number" placeholder="Ft" class="item-price" value="25000" oninput="calcTotal()">
+                <button class="btn" onclick="saveSettings()">Mentés és Bezárás</button>
             </div>
         </div>
-        <button class="btn btn-secondary" type="button" onclick="addItem()" style="font-size: 0.85rem; padding: 8px;">+ Új tétel / Pótmunka hozzáadása</button>
-        <div style="text-align: right; font-weight: 800; font-size: 1.2rem; margin-top: 12px; color: var(--primary);">
-            Végösszeg: <span id="total-sum">25000</span> Ft
+
+        <!-- ÜGYFÉL & MUNKALAP -->
+        <div class="card">
+            <h2>1. Ügyfél Adatai</h2>
+            <label>Megrendelő Neve</label>
+            <input type="text" id="client-name" placeholder="Pl. Kovács János">
+            
+            <label>Cím / Helyszín</label>
+            <input type="text" id="client-address" placeholder="Pl. 8000 Székesfehérvár, Fő u. 12.">
+            
+            <label>Elvégzett Munka Leírása</label>
+            <textarea id="work-desc" rows="3" placeholder="Részletezd a munkát..."></textarea>
         </div>
-    </div>
 
-    <!-- ALÁÍRÁS -->
-    <div class="card">
-        <h2>3. Megrendelő Aláírása</h2>
-        <canvas id="sig-canvas"></canvas>
-        <button class="btn btn-secondary" type="button" onclick="clearSig()" style="padding: 6px; font-size: 0.75rem; margin-top: 4px;">Aláírás törlése</button>
-    </div>
+        <!-- PÓTMUNKÁK -->
+        <div class="card">
+            <h2>2. Tételek és Pótmunkák</h2>
+            <div id="items-container">
+                <div class="row">
+                    <input type="text" placeholder="Megnevezés" class="item-name" value="Alap kiszállási díj és munkadíj">
+                    <input type="number" placeholder="Ft" class="item-price" value="25000" oninput="calcTotal()">
+                </div>
+            </div>
+            <button class="btn btn-secondary" type="button" onclick="addItem()" style="font-size: 0.85rem; padding: 8px;">+ Új tétel / Pótmunka hozzáadása</button>
+            <div style="text-align: right; font-weight: 800; font-size: 1.2rem; margin-top: 12px; color: var(--primary);">
+                Végösszeg: <span id="total-sum">25000</span> Ft
+            </div>
+        </div>
 
-    <button class="btn" onclick="generatePDF()">Munkalap Lezárása & Küldés</button>
+        <!-- ALÁÍRÁS -->
+        <div class="card">
+            <h2>3. Megrendelő Aláírása</h2>
+            <canvas id="sig-canvas"></canvas>
+            <button class="btn btn-secondary" type="button" onclick="clearSig()" style="padding: 6px; font-size: 0.75rem; margin-top: 4px;">Aláírás törlése</button>
+        </div>
+
+        <button class="btn" onclick="generatePDF()">Munkalap Lezárása & Küldés</button>
+    </div>
 
     <!-- LICENC ZÁR -->
     <div id="lock-screen">
@@ -236,16 +203,19 @@
     <script>
         let deferredPrompt;
         const installModal = document.getElementById('install-modal');
+        const appContent = document.getElementById('app-content');
         const settingsModal = document.getElementById('settings-modal');
         const installText = document.getElementById('install-text');
         const installBtn = document.getElementById('install-btn');
 
-        // 5. LÉPÉS: Ha már a főképernyő ikonról indítják (standalone mód), a telepítési ablak SOHA nem jön fel
+        // Ha már standalone módból fut (azaz a főképernyő ikonról indították), SOHA nem mutatjuk a telepítőt, egyből az app indul
         if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
             installModal.style.display = 'none';
+            appContent.style.display = 'block';
         } else {
-            // 2. LÉPÉS: Ha böngészőből nyitják a linket, azonnal megkérdezi a telepítést
+            // Böngészőben nyitva először csak a telepítő ablak látszik, a háttér app teljesen rejtve van!
             installModal.style.display = 'flex';
+            appContent.style.display = 'none';
         }
 
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -255,28 +225,35 @@
 
         function triggerInstall() {
             if (deferredPrompt) {
-                // 3. LÉPÉS: Kiírja, hogy telepíti
                 installText.innerText = "Alkalmazás telepítése folyamatban...";
                 installBtn.style.display = "none";
 
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        // 4. LÉPÉS: Kiírja, hogy kész, majd eltünteti az ablakot
-                        installText.innerText = "Sikeresen telepítve a főképernyőre!";
-                        setTimeout(() => { 
-                            installModal.style.display = 'none'; 
-                        }, 2000);
+                        installText.innerText = "Sikeresen telepítve a főképernyőre! Most már bezárhatod a böngészőt, és az ikonról nyithatod meg.";
                     } else {
-                        installModal.style.display = 'none';
+                        installText.innerText = "Telepítés elvetve.";
                     }
+                    setTimeout(() => { 
+                        installModal.style.display = 'none';
+                        appContent.style.display = 'block'; // Csak a folyamat végén engedjük be a böngészős nézetbe
+                    }, 2500);
                     deferredPrompt = null;
                 });
             } else {
-                installText.innerText = "A böngésző menüjében válaszd a 'Főképernyőre adás' vagy 'Telepítés' opciót!";
+                installText.innerText = "A böngésző menüjében (3 pont) válaszd a 'Főképernyőre adás' vagy 'Telepítés' opciót!";
                 installBtn.style.display = "none";
-                setTimeout(() => { installModal.style.display = 'none'; }, 3000);
+                setTimeout(() => { 
+                    installModal.style.display = 'none';
+                    appContent.style.display = 'block';
+                }, 3500);
             }
+        }
+
+        function skipInstall() {
+            installModal.style.display = 'none';
+            appContent.style.display = 'block';
         }
 
         // Beállítások megnyitása / mentése
@@ -311,9 +288,9 @@
             if(localStorage.getItem('my_bank')) document.getElementById('my-bank').value = localStorage.getItem('my_bank');
             if(localStorage.getItem('my_address')) document.getElementById('my-address').value = localStorage.getItem('my_address');
 
-            // Ha először nyitja meg böngészőben és még nincs elmentve saját adatai sem, ugorjon fel a beállítás is a telepítő után
-            if(!localStorage.getItem('my_name')) {
-                // Kicsit várunk a beállításokkal, amíg a telepítő lefut
+            // Ha böngészőből lép be és még nincsenek saját adatai, a telepítő után megnyithatja a beállításokat
+            if(!localStorage.getItem('my_name') && (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true)) {
+                settingsModal.style.display = 'flex';
             }
         });
 
