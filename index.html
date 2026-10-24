@@ -48,10 +48,9 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
         
-        /* Alapértelmezésben elrejtjük a tartalmat, amíg a telepítés le nem fut vagy ki nem lépnek */
-        body { background: var(--primary); color: var(--text); padding: 12px; max-width: 600px; margin: 0 auto; padding-bottom: 80px; }
+        body { background: #0f172a; color: var(--text); padding: 12px; max-width: 600px; margin: 0 auto; padding-bottom: 80px; }
         
-        #app-content { display: none; } /* Kezdetben rejtve van a munkalap, hogy neugorjon be */
+        #app-content { display: none; }
 
         header { background: var(--primary); color: white; padding: 16px; border-radius: 12px; text-align: center; margin-bottom: 16px; border-bottom: 4px solid var(--accent); position: relative; }
         h1 { font-size: 1.25rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -70,7 +69,7 @@
         }
 
         #install-modal {
-            display: flex; position: fixed; inset: 0; background: #0f172a; z-index: 2000; padding: 20px; align-items: center; justify-content: center;
+            display: flex; position: fixed; inset: 0; background: #0f172a; z-index: 99999; padding: 20px; align-items: center; justify-content: center;
         }
         .install-box {
             background: white; padding: 24px; border-radius: 16px; text-align: center; max-width: 400px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 3px solid var(--accent); color: var(--text);
@@ -102,7 +101,7 @@
 </head>
 <body>
 
-    <!-- TELEPÍTÉSI LÉPÉSEK MODAL -->
+    <!-- KIZÁRÓLAG EZ LÁTSZIK ELŐSZÖR (Nincs háttérbe nyitott app) -->
     <div id="install-modal">
         <div class="install-box">
             <div class="install-icon">📋</div>
@@ -111,11 +110,11 @@
                 Szeretnéd telepíteni a munkalap alkalmazást a telefonod főképernyőjére?
             </p>
             <button id="install-btn" class="btn" onclick="triggerInstall()">IGEN, TELEPÍTÉS</button>
-            <button class="btn btn-secondary" onclick="skipInstall()" style="background:#cbd5e1; color:#334155; font-size:0.85rem; padding:10px; margin-top:8px;">Már telepítettem / Használat böngészőben</button>
+            <button class="btn btn-secondary" onclick="skipInstall()" style="background:#cbd5e1; color:#334155; font-size:0.85rem; padding:10px; margin-top:8px;">Megnyitás a böngészőben</button>
         </div>
     </div>
 
-    <!-- VALÓDI APP TARTALOM (Csak akkor látszik, ha telepítve van vagy ha átlépték) -->
+    <!-- A MUNKALAP TARTALMA (Teljesen rejtve marad, amíg nem telepíted vagy zárod be a telepítőt) -->
     <div id="app-content">
         <header>
             <h1>Szakember Munkalap</h1>
@@ -208,12 +207,12 @@
         const installText = document.getElementById('install-text');
         const installBtn = document.getElementById('install-btn');
 
-        // Ha már standalone módból fut (azaz a főképernyő ikonról indították), SOHA nem mutatjuk a telepítőt, egyből az app indul
+        // Ha már standalone módból fut (azaz a főképernyő ikonról indították), a telepítő soha nem jön fel, egyből az app indul
         if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
             installModal.style.display = 'none';
             appContent.style.display = 'block';
         } else {
-            // Böngészőben nyitva először csak a telepítő ablak látszik, a háttér app teljesen rejtve van!
+            // Böngészőben nyitva KIZÁRÓLAG a telepítő ablak látszik, a munkalap kódja el van rejtve!
             installModal.style.display = 'flex';
             appContent.style.display = 'none';
         }
@@ -231,14 +230,14 @@
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        installText.innerText = "Sikeresen telepítve a főképernyőre! Most már bezárhatod a böngészőt, és az ikonról nyithatod meg.";
+                        installText.innerText = "Sikeresen telepítve a főképernyőre! Mostantól a telefonod ikonjáról tudod megnyitni.";
                     } else {
                         installText.innerText = "Telepítés elvetve.";
                     }
                     setTimeout(() => { 
                         installModal.style.display = 'none';
-                        appContent.style.display = 'block'; // Csak a folyamat végén engedjük be a böngészős nézetbe
-                    }, 2500);
+                        // Miután lettek utasítások, bezárjuk a modalt (vagy ha böngészőben akarja nézni, átvált)
+                    }, 3000);
                     deferredPrompt = null;
                 });
             } else {
@@ -246,7 +245,6 @@
                 installBtn.style.display = "none";
                 setTimeout(() => { 
                     installModal.style.display = 'none';
-                    appContent.style.display = 'block';
                 }, 3500);
             }
         }
@@ -288,7 +286,6 @@
             if(localStorage.getItem('my_bank')) document.getElementById('my-bank').value = localStorage.getItem('my_bank');
             if(localStorage.getItem('my_address')) document.getElementById('my-address').value = localStorage.getItem('my_address');
 
-            // Ha böngészőből lép be és még nincsenek saját adatai, a telepítő után megnyithatja a beállításokat
             if(!localStorage.getItem('my_name') && (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true)) {
                 settingsModal.style.display = 'flex';
             }
