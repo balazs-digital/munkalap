@@ -1145,7 +1145,7 @@ $('testMail').addEventListener('click', async function () {
 });
 
 /* ====== adatmentés és visszaállítás ====== */
-var APP_VERSION = '1.7 (2026-10-25)';
+var APP_VERSION = '1.8 (2026-10-25)';
 $('verInfo').textContent = APP_VERSION;
 function bkStatus(t, k) { var e = $('bkStatus'); e.hidden = !t; e.className = 'status' + (k ? ' ' + k : ''); e.textContent = t || ''; }
 function bkLastShow() { var t = Number(store.get('mk_lastbk')) || 0; $('bkLast').textContent = t ? 'Utolsó mentés: ' + new Date(t).toLocaleString('hu-HU') : 'Még nem volt mentés.'; }
@@ -1164,19 +1164,17 @@ $('bkSave').addEventListener('click', function () {
 });
 if (navigator.canShare && navigator.share) { $('bkShare').hidden = false; if (IOS) { $('bkSave').hidden = true; $('bkShare').textContent = 'Mentés (Fájlok, e-mail, Drive, ...)'; } }
 $('bkShare').addEventListener('click', async function () {
-  var f = backupFile(), tries = [{ n: f.name, t: 'application/json' }, { n: f.name.replace(/\.json$/, '.txt'), t: 'text/plain' }], done = false, lastErr = null;
-  for (var i = 0; i < tries.length && !done; i++) {
-    try {
-      var file = new File([f.blob], tries[i].n, { type: tries[i].t });
-      if (!navigator.canShare || !navigator.canShare({ files: [file] })) continue;
-      await navigator.share({ files: [file], title: 'Munkalap mentés' });
-      store.set('mk_lastbk', String(Date.now())); bkLastShow(); bkStatus('Mentés elküldve.', 'ok'); done = true;
-    } catch (e) {
-      if (e && e.name === 'AbortError') return;
-      lastErr = e;
-    }
+  /* egyetlen share-hívás: a felhasználói gesztus az első híváskor elhasználódik, újrapróbálni nem lehet */
+  var f = backupFile();
+  try {
+    var file = new File([f.blob], f.name.replace(/\.json$/, '.txt'), { type: 'text/plain' });
+    if (!navigator.canShare || !navigator.canShare({ files: [file] })) { bkStatus('Ez a telefon nem tudja megosztani a fájlt. Használd a Mentés fájlba gombot.', 'err'); return; }
+    await navigator.share({ files: [file], title: 'Munkalap mentés' });
+    store.set('mk_lastbk', String(Date.now())); bkLastShow(); bkStatus('Mentés elküldve.', 'ok');
+  } catch (e) {
+    if (e && e.name === 'AbortError') return;
+    bkStatus('A megosztás nem sikerült (' + (e && e.message ? e.message : 'ismeretlen hiba') + '). Használd a Mentés fájlba gombot, és a fájlt küldd el onnan.', 'err');
   }
-  if (!done) bkStatus('Ez a telefon most nem engedi a megosztást' + (lastErr ? ' (' + lastErr.message + ')' : '') + '. Használd a Mentés fájlba gombot, és a fájlt küldd el onnan.', 'err');
 });
 $('bkLoad').addEventListener('click', function () { $('bkFile').click(); });
 $('bkFile').addEventListener('change', async function () {
