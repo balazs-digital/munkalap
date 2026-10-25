@@ -242,7 +242,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
       <button id="bkSave" class="btn sec" type="button">Mentés fájlba</button>
       <button id="bkShare" class="btn sec" type="button" hidden>Mentés elküldése (e-mail, Drive, ...)</button>
       <button id="bkLoad" class="btn sec" type="button">Visszaállítás fájlból</button>
-      <input id="bkFile" type="file" accept=".json,application/json" hidden>
+      <input id="bkFile" type="file" accept=".json,.txt,application/json,text/plain" hidden>
       <div id="bkStatus" class="status" hidden></div>
       <div class="hr"></div>
       <div class="small">Verzió: <span id="verInfo"></span></div>
@@ -1145,7 +1145,7 @@ $('testMail').addEventListener('click', async function () {
 });
 
 /* ====== adatmentés és visszaállítás ====== */
-var APP_VERSION = '1.6 (2026-10-25)';
+var APP_VERSION = '1.7 (2026-10-25)';
 $('verInfo').textContent = APP_VERSION;
 function bkStatus(t, k) { var e = $('bkStatus'); e.hidden = !t; e.className = 'status' + (k ? ' ' + k : ''); e.textContent = t || ''; }
 function bkLastShow() { var t = Number(store.get('mk_lastbk')) || 0; $('bkLast').textContent = t ? 'Utolsó mentés: ' + new Date(t).toLocaleString('hu-HU') : 'Még nem volt mentés.'; }
@@ -1164,10 +1164,19 @@ $('bkSave').addEventListener('click', function () {
 });
 if (navigator.canShare && navigator.share) { $('bkShare').hidden = false; if (IOS) { $('bkSave').hidden = true; $('bkShare').textContent = 'Mentés (Fájlok, e-mail, Drive, ...)'; } }
 $('bkShare').addEventListener('click', async function () {
-  try { var f = backupFile(); var file = new File([f.blob], f.name, { type: 'application/json' });
-    if (navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Munkalap mentés' }); store.set('mk_lastbk', String(Date.now())); bkLastShow(); bkStatus('Mentés elküldve.', 'ok'); }
-    else bkStatus('Ez a telefon nem tudja megosztani a fájlt. Használd a Mentés fájlba gombot.', 'err');
-  } catch (e) { if (e && e.name !== 'AbortError') bkStatus('A küldés nem sikerült: ' + e.message, 'err'); }
+  var f = backupFile(), tries = [{ n: f.name, t: 'application/json' }, { n: f.name.replace(/\.json$/, '.txt'), t: 'text/plain' }], done = false, lastErr = null;
+  for (var i = 0; i < tries.length && !done; i++) {
+    try {
+      var file = new File([f.blob], tries[i].n, { type: tries[i].t });
+      if (!navigator.canShare || !navigator.canShare({ files: [file] })) continue;
+      await navigator.share({ files: [file], title: 'Munkalap mentés' });
+      store.set('mk_lastbk', String(Date.now())); bkLastShow(); bkStatus('Mentés elküldve.', 'ok'); done = true;
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+      lastErr = e;
+    }
+  }
+  if (!done) bkStatus('Ez a telefon most nem engedi a megosztást' + (lastErr ? ' (' + lastErr.message + ')' : '') + '. Használd a Mentés fájlba gombot, és a fájlt küldd el onnan.', 'err');
 });
 $('bkLoad').addEventListener('click', function () { $('bkFile').click(); });
 $('bkFile').addEventListener('change', async function () {
