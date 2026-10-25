@@ -95,13 +95,26 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 <header class="top">
   <div class="brand"><span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#0b2447" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg></span>Munkalap</div>
   <span id="badge" class="badge" hidden></span>
-  <button id="btnList" class="tbtn" type="button">Munkalapok</button>
+  <button id="btnList" class="tbtn" type="button">Kezdőlap</button>
   <button id="btnSettings" class="tbtn" type="button">Beállítások</button>
 </header>
 
 <main>
   <!-- ŰRLAP -->
-  <section id="viewForm">
+  <!-- KEZDŐLAP -->
+  <section id="viewHome">
+    <div class="card">
+      <h2>Mit szeretnél csinálni?</h2>
+      <div id="homeInfo" class="small"></div>
+    </div>
+    <button id="homeCont" class="btn" type="button" hidden>Folytatom a megkezdett munkalapot</button>
+    <button id="homeNew" class="btn dark" type="button">Új munkalap</button>
+    <button id="homeList" class="btn sec" type="button">Mentett munkalapok</button>
+    <button id="homeSet" class="btn sec" type="button">Beállítások</button>
+  </section>
+
+  <!-- ŰRLAP -->
+  <section id="viewForm" hidden>
     <div class="card">
       <h2><span class="n">1</span>Megrendelő</h2>
       <label class="first" for="cname">Neve *</label>
@@ -170,6 +183,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
     <button id="dlBtn" class="btn sec" type="button">PDF letöltése</button>
     <button id="backEdit" class="btn sec" type="button">Vissza a szerkesztéshez</button>
     <button id="newSheet" class="btn dark" type="button">Új munkalap</button>
+    <button id="doneHome" class="btn sec" type="button">Kezdőlap</button>
     <button id="closeApp" class="btn sec" type="button">Bezárás (kilépés az appból)</button>
   </section>
 
@@ -180,7 +194,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
       <div class="small">Minden lezárt munkalap itt marad, amíg te nem törlöd.</div>
       <div id="sheetList" style="margin-top:12px"></div>
     </div>
-    <button id="listBack" class="btn dark" type="button">Vissza</button>
+    <button id="listBack" class="btn dark" type="button">Kezdőlap</button>
   </section>
 
   <!-- BEÁLLÍTÁSOK -->
@@ -931,9 +945,10 @@ $('sigClear').addEventListener('click', function () { D.sig = ''; saveDraft(); s
 window.addEventListener('resize', function () { if (!$('viewForm').hidden) sizeCanvas(); });
 
 /* ====== nézetek ====== */
-function show(v) { ['viewForm', 'viewDone', 'viewSettings', 'viewList'].forEach(function (id) { $(id).hidden = (id !== v); }); window.scrollTo(0, 0); if (v === 'viewForm') { fillForm(); setTimeout(sizeCanvas, 30); } }
+function show(v) { ['viewHome', 'viewForm', 'viewDone', 'viewSettings', 'viewList'].forEach(function (id) { $(id).hidden = (id !== v); }); window.scrollTo(0, 0); if (v === 'viewHome') renderHome(); if (v === 'viewForm') { fillForm(); setTimeout(sizeCanvas, 30); } }
 $('btnSettings').addEventListener('click', function () { fillSettings(); renderGate(); show('viewSettings'); });
-$('settingsDone').addEventListener('click', function () { saveSettings(); show('viewForm'); });
+$('settingsDone').addEventListener('click', function () { saveSettings(); show('viewHome'); });
+$('homeSet').addEventListener('click', function () { $('btnSettings').click(); });
 $('clauseReset').addEventListener('click', function () { S.clause = DEF_CLAUSE; saveSettings(); fillSettings(); toast('Alapszöveg visszaállítva.'); });
 $('wipe').addEventListener('click', function () { if (confirm('Biztosan törlöd a mentett vázlatot és a beállításokat? A licenc és a próbaidő nem törlődik.')) { store.del('mk_draft'); store.del('mk_set'); S = { name: '', taxid: '', phone: '', addr: '', email: '', bank: '', clause: DEF_CLAUSE }; D = newDraft(); fillSettings(); fillForm(); toast('Törölve.'); } });
 
@@ -966,8 +981,9 @@ function renderList() {
   });
   $('sheetList').innerHTML = h;
 }
-$('btnList').addEventListener('click', function () { renderList(); show('viewList'); });
-$('listBack').addEventListener('click', function () { show('viewForm'); });
+$('btnList').addEventListener('click', function () { show('viewHome'); });
+$('homeList').addEventListener('click', function () { renderList(); show('viewList'); });
+$('listBack').addEventListener('click', function () { show('viewHome'); });
 $('sheetList').addEventListener('click', function (e) {
   var act = e.target.getAttribute('data-act'); if (!act) return;
   var id = e.target.closest('.srow').getAttribute('data-id'), a = loadSheets(), x = null, i;
@@ -980,6 +996,20 @@ $('closeApp').addEventListener('click', function () {
   try { window.close(); } catch (e) {}
   setTimeout(function () { toast('Nyomd meg a telefon Kezdőlap gombját (vagy húzd fel a képernyő aljáról), az app a háttérben marad, a következő indításnál itt folytathatod.'); }, 400);
 });
+function draftDirty() { if (D.id) return false; return !!(D.cname || D.cphone || D.cmail || D.caddr || D.desc || D.note || D.sig || D.items.some(function (i) { return i && (i.name || i.qty > 0 && i.price > 0); })); }
+function renderHome() {
+  var n = loadSheets().length, dirty = draftDirty();
+  $('homeCont').hidden = !dirty;
+  if (dirty) $('homeCont').textContent = 'Folytatom: ' + (D.cname || 'megkezdett munkalap');
+  $('homeList').textContent = 'Mentett munkalapok' + (n ? ' (' + n + ')' : '');
+  $('homeInfo').textContent = dirty ? 'Van egy megkezdett munkalapod, folytathatod, vagy indíthatsz újat.' : 'Indíts új munkalapot, vagy nyisd meg a korábbiakat.';
+}
+$('homeCont').addEventListener('click', function () { show('viewForm'); });
+$('homeNew').addEventListener('click', function () {
+  if (draftDirty() && !confirm('A megkezdett munkalap törlődik, mert még nem zártad le. Folytatod?')) return;
+  D = newDraft(); store.set('mk_draft', JSON.stringify(D)); show('viewForm');
+});
+$('doneHome').addEventListener('click', function () { show('viewHome'); });
 $('backEdit').addEventListener('click', function () { show('viewForm'); });
 $('newSheet').addEventListener('click', function () { if (confirm('Új, üres munkalap indul. A jelenlegi törlődik, ha még nem küldted el. Folytatod?')) { D = newDraft(); saveDraft(); store.set('mk_draft', JSON.stringify(D)); show('viewForm'); } });
 function setStatus(text, kind) { var s = $('status'); if (!text) { s.hidden = true; return; } s.hidden = false; s.className = 'status' + (kind ? ' ' + kind : ''); s.textContent = text; }
@@ -1115,7 +1145,7 @@ $('testMail').addEventListener('click', async function () {
 });
 
 /* ====== adatmentés és visszaállítás ====== */
-var APP_VERSION = '1.5 (2026-10-25)';
+var APP_VERSION = '1.6 (2026-10-25)';
 $('verInfo').textContent = APP_VERSION;
 function bkStatus(t, k) { var e = $('bkStatus'); e.hidden = !t; e.className = 'status' + (k ? ' ' + k : ''); e.textContent = t || ''; }
 function bkLastShow() { var t = Number(store.get('mk_lastbk')) || 0; $('bkLast').textContent = t ? 'Utolsó mentés: ' + new Date(t).toLocaleString('hu-HU') : 'Még nem volt mentés.'; }
@@ -1175,8 +1205,7 @@ async function startApp() {
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
   $('inst').hidden = true; $('appRoot').hidden = false; gateMode = false;
   await tick();
-  fillForm(); fillSettings();
-  setTimeout(sizeCanvas, 30);
+  fillForm(); fillSettings(); show('viewHome');
   if (!S.email) setTimeout(function () { toast('Első lépés: add meg a saját adataidat a Beállításokban.'); }, 600);
   setInterval(tick, 30000);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) tick(); });
