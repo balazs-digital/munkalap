@@ -1148,13 +1148,13 @@ $('testMail').addEventListener('click', async function () {
 });
 
 /* ====== adatmentés és visszaállítás ====== */
-var APP_VERSION = '1.9 (2026-10-26)';
+var APP_VERSION = '2.0 (2026-10-26)';
 $('verInfo').textContent = APP_VERSION;
 function bkStatus(t, k) { var e = $('bkStatus'); e.hidden = !t; e.className = 'status' + (k ? ' ' + k : ''); e.textContent = t || ''; }
 function bkLastShow() { var t = Number(store.get('mk_lastbk')) || 0; $('bkLast').textContent = t ? 'Utolsó mentés: ' + new Date(t).toLocaleString('hu-HU') : 'Még nem volt mentés.'; }
 function makeBackup() {
   var lic = null; try { lic = JSON.parse(store.get('mk_lic')); } catch (e) {}
-  return { app: 'munkalap', v: 1, version: APP_VERSION, ts: Date.now(), settings: S, sheets: loadSheets(), draft: D, license: lic };
+  return { app: 'munkalap', v: 1, version: APP_VERSION, ts: Date.now(), t0: gate.t0 || 0, settings: S, sheets: loadSheets(), draft: D, license: lic };
 }
 function backupFile() {
   var d = new Date(); function p(n) { return (n < 10 ? '0' : '') + n; }
@@ -1187,6 +1187,12 @@ $('bkFile').addEventListener('change', async function () {
   if (!confirm('A fájlban ' + o.sheets.length + ' munkalap van. A visszaállítás felülírja a mostani beállításokat és munkalapokat. Folytatod?')) return;
   store.set('mk_set', JSON.stringify(o.settings)); store.set('mk_sheets', JSON.stringify(o.sheets));
   if (o.draft) store.set('mk_draft', JSON.stringify(o.draft));
+  /* a próbaidő kezdete a mentésben is megvan: a törlés + visszaállítás nem indítja újra a 4 napot */
+  var bt = Number(o.t0) || 0;
+  if (bt > 0 && bt <= Date.now()) {
+    var ca = Number(store.get('mk_t0')) || 0, cb = Number(await idbGet('t0')) || 0, cs = [ca, cb, bt].filter(function (x) { return x > 0; });
+    var nt = Math.min.apply(null, cs); store.set('mk_t0', String(nt)); await idbSet('t0', nt);
+  }
   var lic = false;
   if (o.license && o.license.e && o.license.c && await verifyLicense(o.license.e, o.license.c)) { await saveLicense(o.license.e, o.license.c); lic = true; }
   bkStatus('Visszaállítva (' + o.sheets.length + ' munkalap' + (lic ? ', licenc is' : '') + '). Az app újraindul...', 'ok');
