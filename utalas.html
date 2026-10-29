@@ -16,55 +16,100 @@ input:focus{outline:2px solid #fdc300;border-color:#0b2447}
 .row{display:grid;grid-template-columns:1fr 2fr;gap:12px}
 .chk{display:flex;gap:10px;align-items:flex-start;margin:20px 0 4px;font-size:14px;font-weight:400}
 .chk input{margin-top:4px;width:18px;height:18px;flex:none}
-button{display:block;width:100%;margin-top:18px;padding:15px;border:0;border-radius:8px;background:#0d2748;color:#fff;font-weight:700;font-size:17px;cursor:pointer}
-.info{background:#fff8dc;border:1px solid #f0d36a;border-radius:10px;padding:12px 14px;font-size:14px;margin:16px 0 0}
-.ok{text-align:center;display:none}
-.ok .tick{width:64px;height:64px;border-radius:50%;background:#d7f5e3;margin:0 auto 16px;display:flex;align-items:center;justify-content:center}
-.ok .tick svg{width:34px;height:34px}
-.btn{display:block;margin:10px 0 0;padding:14px 18px;border-radius:8px;font-weight:700;text-decoration:none;font-size:16px;border:1px solid #0b2447;color:#0b2447;text-align:center}
+button,.pick{display:block;width:100%;margin-top:10px;padding:14px;border:0;border-radius:8px;background:#0d2748;color:#fff;font-weight:700;font-size:16px;cursor:pointer;text-align:center;text-decoration:none;font-family:inherit}
+button.main{margin-top:18px;font-size:17px;padding:15px}
+.pick.alt{background:#fff;color:#0b2447;border:1px solid #0b2447}
+#valasz{display:none}
+.steps{font-size:15px;margin:0 0 14px;padding-left:20px}
+.hint{font-size:14px;color:#51607a;margin:14px 0 0}
+.back{background:none;color:#51607a;font-weight:400;text-decoration:underline;margin-top:16px;font-size:14px}
 .foot{text-align:center;font-size:13px;color:#51607a;margin-top:18px}
 .foot a{color:#51607a}
-.hp{position:absolute;left:-9999px}
+.ok{color:#12803f;font-weight:700;text-align:center;margin-top:8px;min-height:22px}
 </style></head><body><div class="w">
+
 <div class="card" id="urlap">
   <h1>Vásárlás banki átutalással</h1>
-  <p>Szakember Munkalap, egyszeri díj: <strong>3 990 Ft</strong> (alanyi adómentes, ÁFÁ-t nem tartalmaz). Töltsd ki a számlázási adataidat, és elküldöm a díjbekérőt az utalás adataival.</p>
-  <form action="https://formsubmit.co/balazsdigitalinfo@gmail.com" method="POST">
-    <input type="hidden" name="_subject" value="Munkalap vásárlás – utalással">
-    <input type="hidden" name="_template" value="table">
-    <input type="hidden" name="_captcha" value="false">
-    <input type="hidden" name="_next" value="https://balazs-digital.github.io/munkalap/utalas.html?kuldve=1">
-    <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off">
+  <p>Szakember Munkalap, egyszeri díj: <strong>3 990 Ft</strong> (alanyi adómentes, ÁFÁ-t nem tartalmaz). Töltsd ki a számlázási adataidat. A következő lépésben kiválasztod, mivel küldöd el nekem, és én a díjbekérőt az utalás adataival visszaküldöm.</p>
+  <form id="f" novalidate>
     <label for="nev">Név</label>
-    <input id="nev" name="Név" type="text" required autocomplete="name">
+    <input id="nev" type="text" required autocomplete="name">
     <label for="email">E-mail cím <small>(erre küldöm a díjbekérőt és az aktiváló kódot)</small></label>
-    <input id="email" name="email" type="email" required autocomplete="email">
+    <input id="email" type="email" required autocomplete="email">
     <label for="tel">Telefonszám</label>
-    <input id="tel" name="Telefonszám" type="tel" required autocomplete="tel">
+    <input id="tel" type="tel" required autocomplete="tel">
     <div class="row">
-      <div><label for="irsz">Irányítószám</label><input id="irsz" name="Irányítószám" type="text" required autocomplete="postal-code" inputmode="numeric"></div>
-      <div><label for="telep">Település</label><input id="telep" name="Település" type="text" required autocomplete="address-level2"></div>
+      <div><label for="irsz">Irányítószám</label><input id="irsz" type="text" required autocomplete="postal-code" inputmode="numeric"></div>
+      <div><label for="telep">Település</label><input id="telep" type="text" required autocomplete="address-level2"></div>
     </div>
     <label for="utca">Utca, házszám</label>
-    <input id="utca" name="Utca, házszám" type="text" required autocomplete="street-address">
+    <input id="utca" type="text" required autocomplete="street-address">
     <label for="ceg">Cég neve <small>(ha cégként vásárolsz)</small></label>
-    <input id="ceg" name="Cég neve" type="text" autocomplete="organization">
+    <input id="ceg" type="text" autocomplete="organization">
     <label for="ado">Adószám <small>(ha cégként vásárolsz)</small></label>
-    <input id="ado" name="Adószám" type="text">
-    <label class="chk"><input type="checkbox" name="ÁSZF elfogadva" value="igen" required><span>Elfogadom az <a href="aszf.html#aszf" target="_blank" rel="noopener">Általános szerződési feltételeket</a> és az <a href="aszf.html#adat" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>, és kérem a teljesítés azonnali megkezdését.</span></label>
-    <button type="submit">Díjbekérőt kérek</button>
+    <input id="ado" type="text">
+    <label class="chk"><input id="aszf" type="checkbox" required><span>Elfogadom az <a href="aszf.html#aszf" target="_blank" rel="noopener">Általános szerződési feltételeket</a> és az <a href="aszf.html#adat" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>, és kérem a teljesítés azonnali megkezdését.</span></label>
+    <button type="submit" class="main">Tovább</button>
   </form>
 </div>
-<div class="card ok" id="koszi">
-  <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#12803f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
-  <h1>Köszönöm, megkaptam!</h1>
-  <p>A díjbekérőt az általad megadott e-mail címre küldöm, általában pár órán belül, de legkésőbb 2 munkanap alatt. Az utalás megérkezése után küldöm a számlát és az aktiváló kódot.</p>
-  <p style="font-size:14px">Ha nem érkezik meg a levél, nézd meg a Spam / Promóciók mappát is, vagy írj: <a href="mailto:balazsdigitalinfo@gmail.com">balazsdigitalinfo@gmail.com</a></p>
-  <a class="btn" href="https://balazs-digital.systeme.io/munkalap">Vissza az oldalra</a>
+
+<div class="card" id="valasz">
+  <h1>Küldd el nekem e-mailben</h1>
+  <p>Az üzenet készen van, már csak el kell küldened. Válaszd ki, melyik levelezőt használod:</p>
+  <a class="pick" id="b-gmail" target="_blank" rel="noopener" href="#">Gmail</a>
+  <a class="pick" id="b-outlook" target="_blank" rel="noopener" href="#">Outlook / Hotmail</a>
+  <a class="pick" id="b-yahoo" target="_blank" rel="noopener" href="#">Yahoo Mail</a>
+  <a class="pick alt" id="b-mailto" href="#">Telefon vagy gép levelezőprogramja</a>
+  <button type="button" class="alt pick" id="b-copy">Szöveg másolása (más levelezőhöz)</button>
+  <div class="ok" id="ok"></div>
+  <p class="hint">Címzett: <strong id="cim">balazsdigitalinfo@gmail.com</strong><br>Az e-mailben megnyíló üzenetben csak a „Küldés” gombra kell kattintanod.</p>
+  <p class="hint">A díjbekérőt általában pár órán belül, de legkésőbb 2 munkanap alatt küldöm. Az utalás megérkezése után küldöm a számlát és az aktiváló kódot.</p>
+  <button type="button" class="back" id="vissza">← Vissza az adatokhoz</button>
 </div>
+
 <div class="foot">Balazs - Digital · <a href="aszf.html">ÁSZF és adatkezelés</a></div>
 </div>
 <script>
-if(/[?&]kuldve=1/.test(location.search)){document.getElementById('urlap').style.display='none';document.getElementById('koszi').style.display='block';}
+(function(){
+var TO='balazsdigitalinfo@gmail.com';
+var SUBJ='Szakember Munkalap – vásárlás utalással';
+var f=document.getElementById('f'),urlap=document.getElementById('urlap'),valasz=document.getElementById('valasz');
+var text='';
+function v(id){return document.getElementById(id).value.trim();}
+function build(){
+  var l=['Szia Balázs!','',
+  'Szeretném megvenni a Szakember Munkalap alkalmazást (3 990 Ft) banki átutalással. Kérek díjbekérőt.','',
+  'Számlázási adataim:',
+  'Név: '+v('nev'),
+  'E-mail: '+v('email'),
+  'Telefonszám: '+v('tel'),
+  'Cím: '+v('irsz')+' '+v('telep')+', '+v('utca')];
+  if(v('ceg'))l.push('Cég neve: '+v('ceg'));
+  if(v('ado'))l.push('Adószám: '+v('ado'));
+  l.push('','Elfogadom az Általános szerződési feltételeket (https://balazs-digital.github.io/munkalap/aszf.html), és kérem a teljesítés azonnali megkezdését.');
+  return l.join('\n');
+}
+function links(){
+  var s=encodeURIComponent(SUBJ),b=encodeURIComponent(text),t=encodeURIComponent(TO);
+  document.getElementById('b-gmail').href='https://mail.google.com/mail/?view=cm&fs=1&to='+t+'&su='+s+'&body='+b;
+  document.getElementById('b-outlook').href='https://outlook.live.com/mail/0/deeplink/compose?to='+t+'&subject='+s+'&body='+b;
+  document.getElementById('b-yahoo').href='https://compose.mail.yahoo.com/?to='+t+'&subject='+s+'&body='+b;
+  document.getElementById('b-mailto').href='mailto:'+TO+'?subject='+s+'&body='+b;
+}
+f.addEventListener('submit',function(e){
+  e.preventDefault();
+  if(!f.checkValidity()){f.reportValidity();return;}
+  text=build();links();
+  urlap.style.display='none';valasz.style.display='block';window.scrollTo(0,0);
+});
+document.getElementById('vissza').addEventListener('click',function(){valasz.style.display='none';urlap.style.display='block';window.scrollTo(0,0);});
+document.getElementById('b-copy').addEventListener('click',function(){
+  var ok=document.getElementById('ok');
+  var full='Címzett: '+TO+'\nTárgy: '+SUBJ+'\n\n'+text;
+  function done(){ok.textContent='Kimásolva. Illeszd be egy új e-mailbe a '+TO+' címre.';}
+  function fallback(){var ta=document.createElement('textarea');ta.value=full;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(x){ok.textContent='Nem sikerült másolni, írd meg kézzel: '+TO;}document.body.removeChild(ta);}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(full).then(done,fallback);}else{fallback();}
+});
+})();
 </script>
 </body></html>
