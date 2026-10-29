@@ -30,11 +30,11 @@ button.main{margin-top:18px;font-size:17px;padding:15px}
 
 <div class="card" id="urlap">
   <h1>Vásárlás banki átutalással</h1>
-  <p>Szakember Munkalap, egyszeri díj: <strong>3 990 Ft</strong> (alanyi adómentes, ÁFÁ-t nem tartalmaz). Töltsd ki a számlázási adataidat. A következő lépésben kiválasztod, mivel küldöd el nekem, és én a díjbekérőt az utalás adataival visszaküldöm.</p>
+  <p>Szakember Munkalap, egyszeri díj: <strong>3 990 Ft</strong> (alanyi adómentes, ÁFÁ-t nem tartalmaz). Töltsd ki a számlázási adataidat. A következő lépésben kiválasztod, mivel küldöd el nekem, és én az utalás adataival (számlaszám, összeg, közlemény) visszaírok.</p>
   <form id="f" novalidate>
     <label for="nev">Név</label>
     <input id="nev" type="text" required autocomplete="name">
-    <label for="email">E-mail cím <small>(erre küldöm a díjbekérőt és az aktiváló kódot)</small></label>
+    <label for="email">E-mail cím <small>(erre küldöm az utalás adatait és az aktiváló kódot)</small></label>
     <input id="email" type="email" required autocomplete="email">
     <label for="tel">Telefonszám</label>
     <input id="tel" type="tel" required autocomplete="tel">
@@ -63,7 +63,7 @@ button.main{margin-top:18px;font-size:17px;padding:15px}
   <button type="button" class="alt pick" id="b-copy">Szöveg másolása (más levelezőhöz)</button>
   <div class="ok" id="ok"></div>
   <p class="hint">Címzett: <strong id="cim">balazsdigitalinfo@gmail.com</strong><br>Az e-mailben megnyíló üzenetben csak a „Küldés” gombra kell kattintanod.</p>
-  <p class="hint">A díjbekérőt általában pár órán belül, de legkésőbb 2 munkanap alatt küldöm. Az utalás megérkezése után küldöm a számlát és az aktiváló kódot.</p>
+  <p class="hint">Az utalás adatait általában pár órán belül, de legkésőbb 2 munkanap alatt küldöm. Az utalás megérkezése után küldöm a számlát és az aktiváló kódot.</p>
   <button type="button" class="back" id="vissza">← Vissza az adatokhoz</button>
 </div>
 
@@ -78,7 +78,7 @@ var text='';
 function v(id){return document.getElementById(id).value.trim();}
 function build(){
   var l=['Szia Balázs!','',
-  'Szeretném megvenni a Szakember Munkalap alkalmazást (3 990 Ft) banki átutalással. Kérek díjbekérőt.','',
+  'Szeretném megvenni a Szakember Munkalap alkalmazást (3 990 Ft) banki átutalással. Kérem az utalás adatait.','',
   'Számlázási adataim:',
   'Név: '+v('nev'),
   'E-mail: '+v('email'),
