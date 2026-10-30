@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Szakember Munkalap – ismertető és útmutató</title>
+<style>
+:root{--navy:#0b2447;--yel:#ffc400;--bg:#eef1f6;--txt:#1b2333;--mut:#5b6679;--line:#d6dce8}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--txt);font:17px/1.6 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px 40px}
+header.hero{background:var(--navy);color:#fff;border-bottom:6px solid var(--yel);padding:36px 16px 34px}
+header.hero .in{max-width:860px;margin:0 auto;display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+header.hero img{width:84px;height:84px;border-radius:18px}
+header.hero h1{margin:0;font-size:34px;line-height:1.15}
+header.hero p{margin:6px 0 0;color:#cfd9ee;font-size:18px}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.badges span{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:5px 14px;font-size:15px;font-weight:600}
+.badges span b{color:var(--yel)}
+nav.toc,section.card{background:#fff;border-radius:18px;box-shadow:0 2px 10px rgba(11,36,71,.08);padding:22px 24px;margin:20px 0}
+nav.toc h2{margin:0 0 10px}
+nav.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+nav.toc li{margin:4px 0;break-inside:avoid}
+nav.toc a{color:var(--navy);font-weight:600;text-decoration:none}
+nav.toc a:hover{text-decoration:underline}
+h2{font-size:25px;margin:0 0 12px;color:var(--navy)}
+h2 .n{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--yel);color:var(--navy);font-size:19px;margin-right:10px;vertical-align:2px}
+h3{margin:20px 0 6px;color:var(--navy);font-size:19px}
+p{margin:8px 0}
+ul,ol{padding-left:22px}
+li{margin:5px 0}
+.feat{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:12px 0 0}
+.feat div{background:#f5f8fd;border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.feat b{display:block;color:var(--navy)}
+.tip{background:#fff8dc;border-left:5px solid var(--yel);border-radius:10px;padding:10px 14px;margin:14px 0}
+.warn{background:#fdecec;border-left:5px solid #c0392b;border-radius:10px;padding:10px 14px;margin:14px 0}
+.step{display:flex;gap:22px;align-items:flex-start;margin:20px 0;break-inside:avoid}
+.step .txt{flex:1}
+.phone{flex:0 0 210px;border:7px solid #111826;border-radius:30px;overflow:hidden;background:#111826;box-shadow:0 6px 18px rgba(11,36,71,.25)}
+.phone img{display:block;width:100%}
+.step.r{flex-direction:row-reverse}
+.price{display:flex;gap:16px;flex-wrap:wrap}
+.price div{flex:1 1 200px;background:var(--navy);color:#fff;border-radius:16px;padding:16px 18px}
+.price div b{display:block;font-size:26px;color:var(--yel)}
+table{border-collapse:collapse;width:100%;margin:10px 0}
+td,th{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:#f5f8fd;color:var(--navy)}
+details{border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:10px 0;background:#fbfcfe}
+summary{cursor:pointer;font-weight:700;color:var(--navy)}
+.qr{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.qr img{width:150px;height:150px;border:1px solid var(--line);border-radius:10px}
+a{color:#0b5bd3}
+footer{text-align:center;color:var(--mut);font-size:14px;padding:10px 16px 30px}
+.pdfimg{max-width:100%;border:1px solid var(--line);border-radius:6px;box-shadow:0 3px 10px rgba(0,0,0,.12)}
+@media(max-width:640px){
+ body{font-size:16px}
+ header.hero h1{font-size:27px}
+ nav.toc ol{columns:1}
+ .feat{grid-template-columns:1fr}
+ .step,.step.r{flex-direction:column;align-items:center}
+ .phone{flex-basis:auto;width:230px}
+ section.card,nav.toc{padding:18px 16px}
+}
+@media print{
+ @page{size:A4;margin:12mm}
+ body{background:#fff;font-size:12.5px;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ header.hero{padding:22px 16px}
+ header.hero h1{font-size:28px}
+ nav.toc,section.card{box-shadow:none;border:1px solid var(--line);margin:12px 0;padding:14px 16px}
+ .phone{flex-basis:135px;width:135px;border-width:5px;border-radius:22px;box-shadow:none}
+ h2{font-size:20px}
+ section.card{break-inside:auto}
+ #munkalap{break-before:page}
+ .sample{break-inside:avoid}
+ h2,h3{break-after:avoid}
+ .step{margin:12px 0}
+ details{break-inside:avoid}
+ details{display:block}
+ details>*{display:block}
+ footer{padding:6px}
+}
+</style>
+</head>
+<body>
+
+<header class="hero"><div class="in">
+ <img src="ikon.png" alt="Munkalap ikon">
+ <div>
+  <h1>Szakember Munkalap</h1>
+  <p>Munkalap a telefonodon: kitöltöd, aláíratod a megrendelővel, és már küldöd is PDF-ben.</p>
+  <div class="badges"><span><b>3 990 Ft</b> egyszeri díj</span><span><b>4 nap</b> ingyenes próba</span><span><b>12 hónap</b> e-mailes támogatás</span></div>
+ </div>
+</div></header>
+
+<div class="wrap">
+
+<nav class="toc" id="tartalom">
+ <h2>Tartalom</h2>
+ <ol>
+  <li><a href="#mire">Mire jó az alkalmazás?</a></li>
+  <li><a href="#kell">Mi kell hozzá?</a></li>
+  <li><a href="#telepites">Telepítés a telefonra</a></li>
+  <li><a href="#beallitas">Első lépés: a saját adataid</a></li>
+  <li><a href="#munkalap">Új munkalap készítése</a></li>
+  <li><a href="#kuldes">Lezárás, küldés, PDF</a></li>
+  <li><a href="#mentett">Mentett munkalapok</a></li>
+  <li><a href="#mentes">Adatmentés és telefoncsere</a></li>
+  <li><a href="#licenc">Próbaidő, vásárlás, aktiválás</a></li>
+  <li><a href="#gyik">Gyakori kérdések</a></li>
+  <li><a href="#kapcsolat">Kapcsolat, támogatás</a></li>
+ </ol>
+</nav>
+
+<section class="card" id="mire">
+ <h2><span class="n">1</span>Mire jó az alkalmazás?</h2>
+ <p>Ha szolgáltatást nyújtasz (villanyszerelő, vízszerelő, burkoló, festő, kertész, szerelő, karbantartó, takarító vagy bármilyen más szakember), a munka elkezdése előtt érdemes leírni, <b>mit, mennyiért</b> végzel el, és ezt a megrendelővel <b>alá is íratni</b>. Ez megóv a későbbi vitáktól: a megrendelő is tudja, mire számítson, te pedig tudsz mire hivatkozni.</p>
+ <p>A Munkalap alkalmazással ezt <b>pár perc alatt, a telefonodon</b> megteheted. Nincs papír, nincs külön program, és nem kell hozzá számítógép.</p>
+ <div class="feat">
+  <div><b>Gyors kitöltés</b>Megrendelő, munka leírása, tételek és árak egyetlen egyszerű űrlapon.</div>
+  <div><b>Pótmunka külön jelölve</b>A menet közben felmerülő plusz munkát külön jelölheted, így átlátható marad.</div>
+  <div><b>Aláírás ujjal</b>A megrendelő a telefon képernyőjén írja alá, mellette a rövid elfogadó nyilatkozattal.</div>
+  <div><b>Kész PDF</b>Egy szép, rendezett munkalap PDF-ben, amit e-mailben el is küldhetsz, vagy letöltheted.</div>
+  <div><b>Minden megmarad</b>A lezárt munkalapjaid a telefonodon maradnak, bármikor megnyithatod őket.</div>
+  <div><b>Egyszerű és gyors</b>Nincs regisztráció, nincs havi díj, nincs külön fiók.</div>
+ </div>
+ <div class="tip"><b>Fontos:</b> a munkalap <b>nem számla</b>, és nem helyettesíti azt. A munka elvégzése után a számlát továbbra is a saját számlázódon állítod ki.</div>
+</section>
+
+<section class="card" id="kell">
+ <h2><span class="n">2</span>Mi kell hozzá?</h2>
+ <ul>
+  <li><b>Androidos telefon</b> (Chrome böngészővel) <b>vagy iPhone</b> (Safari böngészővel).</li>
+  <li>Internetkapcsolat a <b>telepítéshez</b> és az e-mail küldéséhez. A munkalapok kitöltéséhez nem kell internet.</li>
+  <li>Egy e-mail cím, amelyre az aktiváló kódot kapod a vásárlás után.</li>
+ </ul>
+ <p>Az alkalmazást <b>telefonra</b> találtuk ki. Számítógépen megnyitva egy QR-kódot mutat, amit a telefonoddal beolvasva megnyithatod.</p>
+ <div class="price" style="margin-top:14px">
+  <div><b>3 990 Ft</b>egyszeri díj, nincs havi előfizetés. Az ár ÁFA-t nem tartalmaz.</div>
+  <div><b>4 nap</b>ingyenes próba, hogy kiderüljön, neked való-e.</div>
+  <div><b>12 hónap</b>e-mailes támogatás a vásárlástól számítva.</div>
+ </div>
+</section>
+
+<section class="card pb" id="telepites">
+ <h2><span class="n">3</span>Telepítés a telefonra</h2>
+ <p>Az alkalmazást <b>nem az áruházból</b> kell letölteni: egyszerűen megnyitod a weboldalát, és felteszed a főképernyőre, onnan úgy indul, mint bármelyik másik app.</p>
+ <div class="qr">
+  <img src="qr.png" alt="QR-kód az alkalmazáshoz">
+  <div>
+   <p style="margin:0">Olvasd be a telefonod kamerájával a QR-kódot, vagy írd be a böngészőbe:</p>
+   <p style="margin:4px 0"><b><a href="https://balazs-digital.github.io/munkalap/">balazs-digital.github.io/munkalap</a></b></p>
+  </div>
+ </div>
+ <h3>Android (Chrome)</h3>
+ <ol>
+  <li>Nyisd meg a címet a <b>Chrome</b> böngészőben.</li>
+  <li>Az alkalmazás felajánlja a telepítést: koppints a <b>Telepítés</b> gombra, és hagyd jóvá.</li>
+  <li>Megjelenik a <b>Munkalap</b> ikon a főképernyőn. A telepítés után onnan indítsd.</li>
+ </ol>
+ <h3>iPhone (Safari)</h3>
+ <ol>
+  <li>Nyisd meg a címet a <b>Safari</b> böngészőben (más böngészőből a telepítés nem működik).</li>
+  <li>Koppints alul a <b>Megosztás</b> gombra (a négyzet, amiből felfelé nyíl mutat).</li>
+  <li>Válaszd a <b>Főképernyőhöz adás</b> lehetőséget, majd az <b>Hozzáadás</b> gombot.</li>
+  <li>A főképernyőn megjelenik a <b>Munkalap</b> ikon, onnan indítsd.</li>
+ </ol>
+ <div class="tip"><b>Tipp:</b> a telepítést érdemes a <b>vásárlás előtt, a próbaidő alatt</b> is elvégezni. Ha később megveszed, ugyanazt az appot használod tovább, a már kitöltött munkalapjaid megmaradnak.</div>
+</section>
+
+<section class="card" id="beallitas">
+ <h2><span class="n">4</span>Első lépés: a saját adataid</h2>
+ <div class="step">
+  <div class="txt">
+   <p>Az első indításkor a <b>Kezdőlapra</b> kerülsz. Innen nyílik minden: <b>Új munkalap</b>, <b>Mentett munkalapok</b> és <b>Beállítások</b>. Ha van megkezdett munkalapod, azt egy külön gombbal folytathatod.</p>
+   <p>Mielőtt az első munkalapot kitöltenéd, nyisd meg a <b>Beállításokat</b>, és add meg a saját adataidat:</p>
+   <ul>
+    <li>név vagy cégnév,</li>
+    <li>adószám,</li>
+    <li>telefonszám és <b>e-mail cím</b>,</li>
+    <li>cím,</li>
+    <li>bankszámlaszám (ha megadod, megjelenik a munkalapon).</li>
+   </ul>
+   <p>Ezeket csak <b>egyszer</b> kell megadnod, minden munkalapra automatikusan rákerülnek. Ha végeztél, koppints a <b>Mentés és vissza</b> gombra.</p>
+   <div class="tip">A Beállításokban a megrendelői nyilatkozat szövegét is átírhatod a saját szájízed szerint.</div>
+  </div>
+  <div class="phone"><img src="01_kezdolap.jpg" alt="Kezdőlap"></div>
+ </div>
+ <div class="step r">
+  <div class="txt"><p><b>Beállítások képernyő:</b> itt adhatod meg a saját adataidat, ezek kerülnek a munkalap „Vállalkozó” rovatába.</p></div>
+  <div class="phone"><img src="02_beallitasok.jpg" alt="Beállítások"></div>
+ </div>
+</section>
+
+<section class="card pb" id="munkalap">
+ <h2><span class="n">5</span>Új munkalap készítése</h2>
+ <p>A Kezdőlapon koppints az <b>Új munkalap</b> gombra. Az űrlap öt részből áll, fentről lefelé haladva töltsd ki.</p>
+
+ <div class="step">
+  <div class="txt">
+   <h3>1. Megrendelő és a munka leírása</h3>
+   <p>Írd be a megrendelő nevét (ez kötelező), a címét, a telefonszámát és az e-mail címét. Alatta rövid szöveggel írd le a munkát, például: <i>fürdőszobai csaptelep cseréje, 2 db konnektor áthelyezése</i>. A dátum alapból a mai nap.</p>
+   <div class="tip">Minden, amit beírsz, <b>automatikusan mentődik</b>. Ha közben megszakad a munka (hívás, telefon lezárása, bezárt app), a Kezdőlapon a <b>Folytatom a megkezdett munkalapot</b> gombbal ott folytathatod, ahol abbahagytad.</div>
+  </div>
+  <div class="phone"><img src="04_urlap_1.jpg" alt="Megrendelő adatai"></div>
+ </div>
+
+ <div class="step r">
+  <div class="txt">
+   <h3>2. Tételek és árak</h3>
+   <p>Minden tételhez add meg a <b>megnevezést</b>, a <b>mennyiséget</b>, az <b>egységet</b> (db, óra, m², fm stb.) és az <b>egységárat</b>. Az alkalmazás kiszámolja a tétel árát és az összeget.</p>
+   <p>A <b>+ Tétel</b> gombbal újabb sort adhatsz hozzá. A <b>+ Pótmunka</b> gombbal olyan munkát vehetsz fel, ami menet közben merült fel: ezt külön jelöli, így a végén is látszik, mi volt az alapmunka és mi a pótmunka. A felesleges sort a <b>Törlés</b> gombbal veheted ki.</p>
+  </div>
+  <div class="phone"><img src="05_tetelek.jpg" alt="Tételek"></div>
+ </div>
+
+ <div class="step">
+  <div class="txt">
+   <h3>Az összeg</h3>
+   <p>A tételek alatt mindig látod az <b>alapmunka</b>, a <b>pótmunka</b> és a <b>végösszeg</b> értékét. Ha az árakat a megrendelővel szóban egyeztetted, itt ellenőrizhetitek együtt.</p>
+  </div>
+  <div class="phone"><img src="06_osszeg.jpg" alt="Összesítés"></div>
+ </div>
+
+ <div class="step r">
+  <div class="txt">
+   <h3>3. Fizetés</h3>
+   <p>Válaszd ki a fizetés módját (készpénz, átutalás, bankkártya vagy egyéb), írd be a fizetési határidőt (például <i>átadáskor</i>), és ha van, egy megjegyzést.</p>
+  </div>
+  <div class="phone"><img src="07_fizetes.jpg" alt="Fizetés"></div>
+ </div>
+
+ <div class="step">
+  <div class="txt">
+   <h3>4. Elolvasás, elfogadás és aláírás</h3>
+   <p>Add oda a telefont a megrendelőnek. Elolvashatja a rövid nyilatkozatot (hogy elfogadja a tételeket és az árakat, és hogy a pótmunkához a hozzájárulása szükséges), bejelöli, hogy <b>elolvasta és elfogadja</b>, majd <b>ujjal aláírja</b> a képernyőn.</p>
+   <p>Ha az aláírás nem sikerült, az <b>Aláírás törlése</b> gombbal újrakezdheti.</p>
+   <p>Végül koppints a <b>Munkalap lezárása</b> gombra.</p>
+  </div>
+  <div class="phone"><img src="09_alairas.jpg" alt="Aláírás"></div>
+ </div>
+</section>
+
+<section class="card pb" id="kuldes">
+ <h2><span class="n">6</span>Lezárás, küldés, PDF</h2>
+ <div class="step">
+  <div class="txt">
+   <p>A lezárás után a munkalap <b>azonnal elmentődik</b>, és a következő lehetőségeid vannak:</p>
+   <ul>
+    <li><b>Küldés e-mailben:</b> a kész PDF-et elküldi <b>a saját e-mail címedre</b> (amit a Beállításokban megadtál), így neked is megvan egy példány. Az első küldésnél egy megerősítő levelet kapsz: nyisd meg, és kattints benne a linkre, utána a küldés már magától megy. Ha nem érkezik meg, nézd meg a levélszemét mappát is.</li>
+    <li><b>Megosztás / küldés a megrendelőnek:</b> megnyitja a telefon megosztó menüjét, ahonnan a PDF-et elküldheted a megrendelőnek e-mailben, üzenetben vagy bármelyik üzenetküldő alkalmazással. (iPhone-on ez a gomb a PDF mentését is elvégzi.)</li>
+    <li><b>PDF letöltése:</b> a PDF a telefonodra kerül (Androidon).</li>
+    <li><b>Vissza a szerkesztéshez:</b> ha mégis javítani kell valamit.</li>
+    <li><b>Új munkalap / Kezdőlap:</b> folytathatod a következő munkával.</li>
+    <li><b>Bezárás:</b> kilép az alkalmazásból.</li>
+   </ul>
+  </div>
+  <div class="phone"><img src="10_kesz.jpg" alt="Kész munkalap"></div>
+ </div>
+ <div class="sample"><p>Így néz ki a kész munkalap PDF-ben (ezt küldheted el a megrendelőnek):</p>
+ <p style="text-align:center"><img class="pdfimg" src="minta_pdf-1.jpg" alt="Minta munkalap PDF" style="width:70%;max-width:480px"></p></div>
+</section>
+
+<section class="card" id="mentett">
+ <h2><span class="n">7</span>Mentett munkalapok</h2>
+ <div class="step">
+  <div class="txt">
+   <p>Minden lezárt munkalap a <b>Mentett munkalapok</b> között marad, amíg te nem törlöd. Egy koppintással megnyithatod, és onnan újra elküldheted vagy letöltheted a PDF-et, vagy törölheted, ha már nincs rá szükséged.</p>
+   <p>A listában látod a megrendelő nevét, a dátumot és az összeget, így könnyen megtalálod a keresett munkalapot.</p>
+  </div>
+  <div class="phone"><img src="12_mentett.jpg" alt="Mentett munkalapok"></div>
+ </div>
+</section>
+
+<section class="card pb" id="mentes">
+ <h2><span class="n">8</span>Adatmentés és telefoncsere</h2>
+ <div class="step">
+  <div class="txt">
+   <p>Az adataid <b>csak a te telefonodon</b> vannak, nem kerülnek fel sehova. Ez a biztonságod miatt jó, de azt is jelenti, hogy ha a telefon elromlik, elvész vagy lecseréled, az adatok nélküle nem állíthatók vissza.</p>
+   <p>Ezért érdemes <b>rendszeresen biztonsági mentést</b> készíteni:</p>
+   <ol>
+    <li>Kezdőlap → <b>Beállítások</b> → <b>Adatmentés</b>.</li>
+    <li>Koppints a <b>Mentés fájlba</b> gombra.</li>
+    <li>A kapott fájlt küldd el magadnak e-mailben, vagy tedd Google Drive-ra.</li>
+   </ol>
+   <p>Telefoncsere vagy törlés után telepítsd újra az alkalmazást, és a <b>Visszaállítás fájlból</b> gombbal töltsd vissza a mentést. A munkalapjaid, a beállításaid, a <b>licenced</b> és a próbaidőd is visszajön.</p>
+  </div>
+  <div class="phone"><img src="03b_mentes.jpg" alt="Adatmentés"></div>
+ </div>
+ <div class="warn"><b>Fontos:</b> ha az alkalmazás ikonját letörlöd a telefonról, vagy a böngésző adatait törlöd, a benne tárolt adatok is törlődnek. Előtte mindig készíts mentést!</div>
+</section>
+
+<section class="card" id="licenc">
+ <h2><span class="n">9</span>Próbaidő, vásárlás, aktiválás</h2>
+ <h3>Ingyenes próba</h3>
+ <p>Az első megnyitástól számítva <b>4 napig</b> mindent kipróbálhatsz, korlátozás nélkül. A képernyő tetején látod, mennyi van még hátra. A próbához sem regisztráció, sem bankkártya nem kell.</p>
+ <h3>Vásárlás</h3>
+ <p>Az alkalmazás ára <b>3 990 Ft</b>, egyszeri díj (ÁFA-t nem tartalmaz). Kétféleképpen fizethetsz:</p>
+ <ul>
+  <li><b>Bankkártyával:</b> az értékesítési oldal gombjára kattintva a biztonságos, bankkártyás fizetőoldalra jutsz. A fizetés után a köszönő oldalon leírom, mi a következő lépés.</li>
+  <li><b>Banki átutalással:</b> az értékesítési oldalon az <i>„Inkább banki átutalással fizetnél?”</i> linkre kattintva megadhatod az adataidat, és megkapod az utalás adatait.</li>
+ </ul>
+ <h3>Az aktiváló kód</h3>
+ <p>A fizetés beérkezése után az <b>aktiváló kódot e-mailben küldöm</b>, általában pár órán belül, de legkésőbb 2 munkanapon belül. A levélben két lehetőséged van:</p>
+ <ol>
+  <li>Kattints a levélben lévő <b>aktiváló linkre</b> a telefonodon, és az alkalmazás magától aktiválja a licencet, vagy</li>
+  <li>nyisd meg az alkalmazást: <b>Beállítások → Licenc</b>, írd be az <b>e-mail címet</b> (amire a kódot kaptad) és az <b>aktiváló kódot</b>, majd koppints az <b>Aktiválás</b> gombra.</li>
+ </ol>
+ <div class="step">
+  <div class="txt">
+   <p>Az aktiválás után a próbaidő jelzés eltűnik, és az alkalmazást korlátlan ideig használhatod.</p>
+   <div class="tip"><b>iPhone-on</b> a főképernyőn lévő app külön tárolót kap, ezért a kódot <b>a telepített appban</b> (Beállítások → Licenc) kell megadni.</div>
+   <div class="tip">A kódot a telefoncsere utáni <b>visszaállításkor</b> már nem kell újra begépelned, mert a mentésfájl tartalmazza.</div>
+  </div>
+  <div class="phone"><img src="03_licenc.jpg" alt="Licenc aktiválása"></div>
+ </div>
+ <h3>Mi történik a próbaidő lejárta után?</h3>
+ <p>Ha nem aktiválod a licencet, az alkalmazás zárolódik: új munkalapot nem tudsz készíteni. A korábbi adataid <b>nem vesznek el</b>, az aktiválás után minden újra elérhető.</p>
+</section>
+
+<section class="card pb" id="gyik">
+ <h2><span class="n">10</span>Gyakori kérdések</h2>
+ <details><summary>Kell hozzá internet?</summary><p>A telepítéshez és az e-mail küldéséhez igen. A munkalapok kitöltéséhez, aláírásához és mentéséhez nem, ezt bárhol megteheted, akár térerő nélküli helyszínen is.</p></details>
+ <details><summary>Havi díjat is kell fizetnem?</summary><p>Nem. A 3 990 Ft egyszeri díj, nincs előfizetés és nincs rejtett költség.</p></details>
+ <details><summary>Több telefonon is használhatom?</summary><p>A licenc egy vállalkozóhoz tartozik. Ha lecseréled a telefonodat, a mentésből visszaállíthatod a régi adataidat az újon is. Egy másik személy számára külön licenc szükséges.</p></details>
+ <details><summary>Mi van, ha elveszett vagy elromlott a telefonom?</summary><p>Ha készítettél biztonsági mentést (8. fejezet), az új telefonon visszaállíthatod. Mentés nélkül az adatok nem állíthatók vissza, mert csak a telefonodon vannak. Ha az aktiváló kódod elveszett, írj nekem, és újra elküldöm.</p></details>
+ <details><summary>Jogilag érvényes a telefonon aláírt munkalap?</summary><p>A munkalap a megrendelővel való megállapodásod <b>egyszerű írásos rögzítése</b>, a szolgáltatás és az árak egyértelmű dokumentálására való. Ez nem számla, és nem jogi tanácsadás.</p></details>
+ <details><summary>Miért nem találom az alkalmazást az áruházban?</summary><p>Az alkalmazás egy telepíthető webalkalmazás, ezért nem kell az áruházból letölteni. A weboldalról közvetlenül a főképernyőre teszed, így mindig a legfrissebb változatot kapod.</p></details>
+ <details><summary>Az ikon helyett a böngészőben nyílik meg. Mit tegyek?</summary><p>Zárd be, és indítsd a főképernyőn lévő Munkalap ikonról. Ha ott nincs, végezd el újra a telepítést a 3. fejezet szerint.</p></details>
+ <details><summary>Kapok frissítéseket?</summary><p>Igen, a javítások és az újdonságok internetkapcsolat esetén a következő indításkor maguktól megjelennek, az adataid megmaradnak.</p></details>
+</section>
+
+<section class="card" id="kapcsolat">
+ <h2><span class="n">11</span>Kapcsolat, támogatás</h2>
+ <p>Ha elakadsz, kérdésed van, vagy elveszett az aktiváló kódod, írj nekem e-mailben:</p>
+ <p style="font-size:20px"><b><a href="mailto:balazsdigitalinfo@gmail.com">balazsdigitalinfo@gmail.com</a></b></p>
+ <p>Az e-mailes támogatás a vásárlástól számított <b>12 hónapig</b> jár. Általában pár órán belül, de legkésőbb 2 munkanapon belül válaszolok.</p>
+ <p style="margin-top:14px">Az <a href="https://balazs-digital.github.io/munkalap/aszf.html">ÁSZF, adatkezelési tájékoztató és impresszum</a> itt olvasható.</p>
+ <p><b>Horváth Balázs</b></p>
+</section>
+
+</div>
+<footer>Szakember Munkalap · ismertető és útmutató · 2.0-s változat</footer>
+</body>
+</html>
