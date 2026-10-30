@@ -168,7 +168,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
     </div>
 
     <button id="finish" class="btn dark" type="button">Munkalap lezárása</button>
-    <div class="note" style="text-align:center">Lezárás után elküldheted a megrendelőnek, vagy letöltheted PDF-ben.</div>
+    <div class="note" style="text-align:center">Lezárás után elküldheted a PDF-et e-mailben, vagy letöltheted.</div>
   </section>
 
   <!-- KÉSZ -->
@@ -178,7 +178,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
       <div id="doneInfo"></div>
       <div id="status" class="status" hidden></div>
     </div>
-    <button id="shareBtn" class="btn" type="button">Küldés a megrendelőnek (e-mail, üzenet, ...)</button>
+    <button id="shareBtn" class="btn" type="button">PDF küldés e-mailben</button>
     <button id="dlBtn" class="btn sec" type="button">PDF letöltése</button>
     <button id="backEdit" class="btn sec" type="button">Vissza a szerkesztéshez</button>
     <button id="newSheet" class="btn dark" type="button">Új munkalap</button>
@@ -968,7 +968,7 @@ $('finish').addEventListener('click', function () {
 function showDone() {
   var t = totals();
   $('doneInfo').innerHTML = '<div class="small">Megrendelő</div><div style="font-weight:800;font-size:20px">' + esc(D.cname) + '</div><div class="small" style="margin-top:10px">Összesen</div><div class="big">' + money(t.sum) + '</div><div class="small" style="margin-top:8px">A munkalap el lett mentve a Mentett munkalapok között.</div>';
-  setStatus(D.sent ? 'Elküldve a megrendelőnek \u2713' : '', D.sent ? 'ok' : ''); show('viewDone');
+  setStatus(D.sent ? 'Megosztva \u2713' : '', D.sent ? 'ok' : ''); show('viewDone');
 }
 function loadSheets() { try { var a = JSON.parse(store.get('mk_sheets')); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
 function renderList() {
@@ -1093,7 +1093,7 @@ $('dlBtn').addEventListener('click', function () {
 });
 if (IOS) { $('dlBtn').hidden = true; }
 function shareText(p) {
-  var t = 'Tisztelt ' + (D.cname || 'Megrendelő') + '!\n\nCsatolva küldöm a munkalapot (' + p.id + '), a munka összege: ' + money(p.total) + '.\n\nKöszönöm a megrendelést!\n\nÜdvözlettel:\n' + (S.name || '');
+  var t = 'Üdvözlöm!\n\nMellékelten küldöm a munkalapot (azonosító: ' + p.id + '), a munka összege: ' + money(p.total) + '.\n\nKöszönöm!\n\nÜdvözlettel:\n' + (S.name || '');
   if (S.phone) t += '\n' + S.phone;
   if (S.email) t += '\n' + S.email;
   return t;
@@ -1102,8 +1102,8 @@ $('shareBtn').addEventListener('click', async function () {
   try {
     var p = getPdf(); var f = new File([p.blob], p.name, { type: 'application/pdf' });
     var title = 'Munkalap – ' + D.cname, text = shareText(p);
-    if (navigator.share && navigator.canShare && navigator.canShare({ files: [f], text: text })) { await navigator.share({ files: [f], title: title, text: text }); markSent(); setStatus('Elküldve a megrendelőnek \u2713', 'ok'); }
-    else if (navigator.share && navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: title }); markSent(); setStatus('Elküldve a megrendelőnek \u2713', 'ok'); }
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [f], text: text })) { await navigator.share({ files: [f], title: title, text: text }); markSent(); setStatus('Megosztva \u2713', 'ok'); }
+    else if (navigator.share && navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: title }); markSent(); setStatus('Megosztva \u2713', 'ok'); }
     else setStatus('Ez az eszköz nem tudja fájlként megosztani. Használd a PDF letöltése gombot, és küldd el a fájlt.', 'err');
   } catch (e) { if (e && e.name !== 'AbortError') setStatus('A küldés nem sikerült: ' + e.message, 'err'); }
 });
@@ -1115,7 +1115,7 @@ function markSent() {
 }
 
 /* ====== adatmentés és visszaállítás ====== */
-var APP_VERSION = '2.2 (2026-10-30)';
+var APP_VERSION = '2.3 (2026-10-30)';
 $('verInfo').textContent = APP_VERSION;
 function bkStatus(t, k) { var e = $('bkStatus'); e.hidden = !t; e.className = 'status' + (k ? ' ' + k : ''); e.textContent = t || ''; }
 function bkLastShow() { var t = Number(store.get('mk_lastbk')) || 0; $('bkLast').textContent = t ? 'Utolsó mentés: ' + new Date(t).toLocaleString('hu-HU') : 'Még nem volt mentés.'; }
