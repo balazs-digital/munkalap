@@ -168,7 +168,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
     </div>
 
     <button id="finish" class="btn dark" type="button">Munkalap lezárása</button>
-    <div class="note" style="text-align:center">Lezárás után küldheted e-mailben, megoszthatod vagy letöltheted PDF-ben.</div>
+    <div class="note" style="text-align:center">Lezárás után elküldheted a megrendelőnek, vagy letöltheted PDF-ben.</div>
   </section>
 
   <!-- KÉSZ -->
@@ -178,8 +178,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
       <div id="doneInfo"></div>
       <div id="status" class="status" hidden></div>
     </div>
-    <button id="sendMail" class="btn" type="button">Küldés e-mailben</button>
-    <button id="shareBtn" class="btn sec" type="button" hidden>Megosztás / küldés a megrendelőnek</button>
+    <button id="shareBtn" class="btn" type="button">Küldés a megrendelőnek (e-mail, üzenet, ...)</button>
     <button id="dlBtn" class="btn sec" type="button">PDF letöltése</button>
     <button id="backEdit" class="btn sec" type="button">Vissza a szerkesztéshez</button>
     <button id="newSheet" class="btn dark" type="button">Új munkalap</button>
@@ -212,11 +211,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
       <input id="sbank" type="text" data-s="bank">
       <label for="saddr">Cím</label>
       <input id="saddr" type="text" data-s="addr">
-      <label for="smail">Az e-mail címed (ide megy a kész munkalap) *</label>
+      <label for="smail">Az e-mail címed (megjelenik a munkalapon)</label>
       <input id="smail" type="email" data-s="email">
-      <div class="note">Az első küldésnél a levelező szolgáltató egy megerősítő levelet küld erre a címre. Kattints a benne lévő linkre, utána működik a küldés.</div>
-      <button id="testMail" class="btn sec" type="button" style="margin-top:12px">Teszt e-mail küldése</button>
-      <div id="testStatus" class="status" hidden></div>
     </div>
     <div class="card">
       <h2>Szerződéses szöveg</h2>
@@ -948,7 +944,7 @@ $('sigClear').addEventListener('click', function () { D.sig = ''; saveDraft(); s
 window.addEventListener('resize', function () { if (!$('viewForm').hidden) sizeCanvas(); });
 
 /* ====== nézetek ====== */
-function show(v) { ['viewHome', 'viewForm', 'viewDone', 'viewSettings', 'viewList'].forEach(function (id) { $(id).hidden = (id !== v); }); window.scrollTo(0, 0); if (v === 'viewHome') renderHome(); if (v === 'viewForm') { fillForm(); setTimeout(sizeCanvas, 30); } }
+function show(v) { ['viewHome', 'viewForm', 'viewDone', 'viewSettings', 'viewList'].forEach(function (id) { $(id).hidden = (id !== v); }); window.scrollTo(0, 0); try { sessionStorage.setItem('mk_view', v); sessionStorage.setItem('mk_scroll', '0'); } catch (e) {} if (v === 'viewHome') renderHome(); if (v === 'viewForm') { fillForm(); setTimeout(sizeCanvas, 30); } }
 $('btnSettings').addEventListener('click', function () { fillSettings(); renderGate(); show('viewSettings'); });
 $('settingsDone').addEventListener('click', function () { saveSettings(); show('viewHome'); });
 $('homeSet').addEventListener('click', function () { $('btnSettings').click(); });
@@ -971,8 +967,8 @@ $('finish').addEventListener('click', function () {
 });
 function showDone() {
   var t = totals();
-  $('doneInfo').innerHTML = '<div class="small">Megrendelő</div><div style="font-weight:800;font-size:20px">' + esc(D.cname) + '</div><div class="small" style="margin-top:10px">Összesen</div><div class="big">' + money(t.sum) + '</div><div class="small" style="margin-top:8px">A munkalap el lett mentve a Munkalapok között.</div>';
-  $('sendMail').hidden = !!D.sent; setStatus(D.sent ? 'Elküldve e-mailben \u2713' : '', D.sent ? 'ok' : ''); show('viewDone');
+  $('doneInfo').innerHTML = '<div class="small">Megrendelő</div><div style="font-weight:800;font-size:20px">' + esc(D.cname) + '</div><div class="small" style="margin-top:10px">Összesen</div><div class="big">' + money(t.sum) + '</div><div class="small" style="margin-top:8px">A munkalap el lett mentve a Mentett munkalapok között.</div>';
+  setStatus(D.sent ? 'Elküldve a megrendelőnek \u2713' : '', D.sent ? 'ok' : ''); show('viewDone');
 }
 function loadSheets() { try { var a = JSON.parse(store.get('mk_sheets')); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
 function renderList() {
@@ -1095,60 +1091,31 @@ $('dlBtn').addEventListener('click', function () {
   try { var p = getPdf(); var u = URL.createObjectURL(p.blob); var a = document.createElement('a'); a.href = u; a.download = p.name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(u); a.remove(); }, 4000); setStatus('A PDF letöltődött.', 'ok'); }
   catch (e) { setStatus('A PDF készítése nem sikerült: ' + e.message, 'err'); }
 });
-if (navigator.canShare && navigator.share) { $('shareBtn').hidden = false; if (IOS) { $('dlBtn').hidden = true; $('shareBtn').textContent = 'PDF mentése / megosztása (Fájlok, e-mail, ...)'; } }
+if (IOS) { $('dlBtn').hidden = true; }
+function shareText(p) {
+  var t = 'Tisztelt ' + (D.cname || 'Megrendelő') + '!\n\nCsatolva küldöm a munkalapot (' + p.id + '), a munka összege: ' + money(p.total) + '.\n\nKöszönöm a megrendelést!\n\nÜdvözlettel:\n' + (S.name || '');
+  if (S.phone) t += '\n' + S.phone;
+  if (S.email) t += '\n' + S.email;
+  return t;
+}
 $('shareBtn').addEventListener('click', async function () {
   try {
     var p = getPdf(); var f = new File([p.blob], p.name, { type: 'application/pdf' });
-    if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: 'Munkalap – ' + D.cname }); setStatus('Megosztva.', 'ok'); }
-    else setStatus('Ez a telefon nem tudja fájlként megosztani. Használd a PDF letöltése gombot.', 'err');
-  } catch (e) { if (e && e.name !== 'AbortError') setStatus('A megosztás nem sikerült: ' + e.message, 'err'); }
+    var title = 'Munkalap – ' + D.cname, text = shareText(p);
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [f], text: text })) { await navigator.share({ files: [f], title: title, text: text }); markSent(); setStatus('Elküldve a megrendelőnek \u2713', 'ok'); }
+    else if (navigator.share && navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: title }); markSent(); setStatus('Elküldve a megrendelőnek \u2713', 'ok'); }
+    else setStatus('Ez az eszköz nem tudja fájlként megosztani. Használd a PDF letöltése gombot, és küldd el a fájlt.', 'err');
+  } catch (e) { if (e && e.name !== 'AbortError') setStatus('A küldés nem sikerült: ' + e.message, 'err'); }
 });
 
-/* ====== e-mail küldés (FormSubmit) ====== */
-async function submitMail(to, fields, file) {
-  var fd = new FormData();
-  Object.keys(fields).forEach(function (k) { fd.append(k, fields[k]); });
-  fd.append('_template', 'table'); fd.append('_captcha', 'false'); fd.append('_honey', '');
-  if (file) fd.append('attachment', file);
-  var ctl = (typeof AbortController !== 'undefined') ? new AbortController() : null; var to_ = setTimeout(function () { if (ctl) ctl.abort(); }, 45000);
-  try {
-    var r = await fetch('https://formsubmit.co/ajax/' + encodeURIComponent(to), { method: 'POST', body: fd, headers: { 'Accept': 'application/json' }, signal: ctl ? ctl.signal : undefined });
-    var j = {}; try { j = await r.json(); } catch (e) {}
-    clearTimeout(to_);
-    if (r.ok && (j.success === true || j.success === 'true')) return { ok: true, msg: j.message || '' };
-    var raw = String(j.message || '');
-    if (/activat|confirm|verif/i.test(raw)) return { ok: false, act: true, msg: 'Az első küldésnél egyszeri megerősítés kell. Küldtünk egy levelet a megadott e-mail címedre (nézd meg a levélszemét mappát is). Nyisd meg, kattints benne a megerősítő gombra, utána nyomd meg újra a küldést.' };
-    return { ok: false, msg: 'A küldés most nem sikerült (' + r.status + '). Próbáld újra, vagy használd a Megosztás vagy a PDF letöltése gombot.' };
-  } catch (e) { clearTimeout(to_); return { ok: false, msg: navigator.onLine ? 'A küldés nem sikerült (időtúllépés vagy hálózati hiba).' : 'Nincs internetkapcsolat.' }; }
-}
-function mailValid() { return /.+@.+\..+/.test(S.email || ''); }
-$('sendMail').addEventListener('click', async function () {
-  if (!mailValid()) { toast('Add meg a Beállításokban a saját e-mail címedet.'); fillSettings(); show('viewSettings'); return; }
-  var b = $('sendMail'); b.disabled = true; setStatus('Küldés folyamatban...', '');
-  try {
-    var p = getPdf(); var f = new File([p.blob], p.name, { type: 'application/pdf' });
-    var res = await submitMail(S.email, { '_subject': 'Munkalap – ' + D.cname + ' – ' + money(p.total), 'Munkalap': p.id, 'Megrendelő': D.cname, 'Cím': D.caddr, 'Telefon': D.cphone, 'Megrendelő e-mail': D.cmail, 'Összesen': money(p.total), 'Munka': D.desc }, f);
-    if (res.ok) { markSent(); $('sendMail').hidden = true; }
-    if (res.ok) setStatus('Elküldve \u2713 ide: ' + S.email + '. Ha nem érkezik meg pár percen belül, nézd meg a levélszemét mappát, és az első küldésnél kattints a megerősítő levélben lévő linkre.', 'ok');
-    else if (res.act) setStatus(res.msg, ''); else setStatus(res.msg, 'err');
-  } catch (e) { setStatus('Hiba: ' + e.message, 'err'); }
-  b.disabled = false;
-});
 function markSent() {
   D.sent = true; store.set('mk_draft', JSON.stringify(D));
   var a = loadSheets(); for (var i = 0; i < a.length; i++) if (a[i].id === D.id) a[i].d = JSON.parse(JSON.stringify(D));
   store.set('mk_sheets', JSON.stringify(a));
 }
-$('testMail').addEventListener('click', async function () {
-  var s = $('testStatus'); s.hidden = false; s.className = 'status';
-  if (!mailValid()) { s.className = 'status err'; s.textContent = 'Előbb add meg az e-mail címedet.'; return; }
-  s.textContent = 'Küldés...';
-  var res = await submitMail(S.email, { '_subject': 'Munkalap – teszt', 'Üzenet': 'Ez egy teszt. Ha ezt látod, a küldés működik.' }, null);
-  if (res.ok) { s.className = 'status ok'; s.textContent = 'Elküldve. Nézd meg a leveleidet. Az első alkalommal egy megerősítő levelet kapsz, abban kattints a linkre.'; } else if (res.act) { s.className = 'status'; s.textContent = res.msg; } else { s.className = 'status err'; s.textContent = res.msg; }
-});
 
 /* ====== adatmentés és visszaállítás ====== */
-var APP_VERSION = '2.0 (2026-10-26)';
+var APP_VERSION = '2.2 (2026-10-30)';
 $('verInfo').textContent = APP_VERSION;
 function bkStatus(t, k) { var e = $('bkStatus'); e.hidden = !t; e.className = 'status' + (k ? ' ' + k : ''); e.textContent = t || ''; }
 function bkLastShow() { var t = Number(store.get('mk_lastbk')) || 0; $('bkLast').textContent = t ? 'Utolsó mentés: ' + new Date(t).toLocaleString('hu-HU') : 'Még nem volt mentés.'; }
@@ -1221,8 +1188,17 @@ async function startApp() {
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
   $('inst').hidden = true; $('appRoot').hidden = false; gateMode = false;
   await tick();
-  fillForm(); fillSettings(); show('viewHome');
-  if (!S.email) setTimeout(function () { toast('Első lépés: add meg a saját adataidat a Beállításokban.'); }, 600);
+  fillForm(); fillSettings();
+  var rv = '', sy = 0; try { rv = sessionStorage.getItem('mk_view') || ''; sy = Number(sessionStorage.getItem('mk_scroll')) || 0; } catch (e) {}
+  if (rv === 'viewForm' || rv === 'viewDone') { var okv = rv === 'viewForm' ? (draftDirty() || !!D.id) : (D.id && loadSheets().some(function (x) { return x.id === D.id; })); if (!okv) rv = ''; }
+  if (rv === 'viewDone') showDone();
+  else if (rv === 'viewList') { renderList(); show('viewList'); }
+  else if (rv === 'viewSettings') { fillSettings(); renderGate(); show('viewSettings'); }
+  else if (rv === 'viewForm') show('viewForm');
+  else show('viewHome');
+  if (rv && sy > 0) setTimeout(function () { window.scrollTo(0, sy); try { sessionStorage.setItem('mk_scroll', String(sy)); } catch (e) {} }, 250);
+  var scT = null; window.addEventListener('scroll', function () { if (scT) return; scT = setTimeout(function () { scT = null; try { sessionStorage.setItem('mk_scroll', String(window.pageYOffset || 0)); } catch (e) {} }, 300); }, { passive: true });
+  if (!S.name) setTimeout(function () { toast('Első lépés: add meg a saját adataidat a Beállításokban.'); }, 600);
   setInterval(tick, 30000);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) tick(); });
 }
