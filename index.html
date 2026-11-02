@@ -57,6 +57,12 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 .addrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .addrow .btn{min-height:52px;font-size:16px}
 .addrow .btn+.btn{margin-top:0}
+.pbox{border:2px solid var(--yellow);background:#fffaf0;border-radius:14px;padding:12px;margin-bottom:12px}
+.pbox>b{display:block;font-size:16px;color:var(--navy)}
+.pbox .small{font-size:13px;margin-bottom:4px}
+.prow{padding:6px 0;border-top:1px solid #f1e3b8}
+.prow span{display:flex;flex-direction:column;line-height:1.25}
+.prow small{font-size:14px;font-weight:600;color:var(--mut)}
 .tot{margin-top:14px;border-top:3px solid var(--navy);padding-top:10px}
 .tot div{display:flex;justify-content:space-between;font-size:17px;padding:3px 0}
 .tot .sum{font-size:24px;font-weight:800;color:var(--navy)}
@@ -137,6 +143,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 
     <div class="card">
       <h2><span class="n">3</span>Tételek és árak</h2>
+      <div id="presetBox" hidden></div>
       <div id="items"></div>
       <div class="addrow">
         <button id="addItem" class="btn sec" type="button">+ Tétel</button>
@@ -213,6 +220,12 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
       <input id="saddr" type="text" data-s="addr">
       <label for="smail">Az e-mail címed (megjelenik a munkalapon)</label>
       <input id="smail" type="email" data-s="email">
+    </div>
+    <div class="card">
+      <h2>Gyakori tételeim</h2>
+      <div class="small">Amit sokszor felszámolsz (pl. kiszállási díj, óradíj, km-díj), egyszer vidd fel ide. Munkalapnál elég kipipálni, és bekerül a tételek közé. A mennyiséget a munkalapon átírhatod.</div>
+      <div id="presetEd" style="margin-top:12px"></div>
+      <button id="presetAdd" class="btn sec" type="button">+ Új gyakori tétel</button>
     </div>
     <div class="card">
       <h2>Szerződéses szöveg</h2>
@@ -850,6 +863,15 @@ function readJSON(k, d) { try { var v = JSON.parse(store.get(k)); return v && ty
 var S = readJSON('mk_set', {});
 ['name', 'taxid', 'phone', 'addr', 'email', 'bank'].forEach(function (k) { if (typeof S[k] !== 'string') S[k] = ''; });
 if (!S.clause) S.clause = DEF_CLAUSE;
+function blankPreset() { return { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: '', qty: '1', unit: 'db', price: '' }; }
+function normPresets() {
+  if (!Array.isArray(S.presets)) S.presets = [];
+  S.presets = S.presets.filter(function (p) { return p && typeof p === 'object'; }).map(function (p) {
+    return { id: p.id ? String(p.id) : blankPreset().id, name: String(p.name == null ? '' : p.name), qty: String(p.qty == null || p.qty === '' ? '1' : p.qty), unit: String(p.unit || 'db'), price: String(p.price == null ? '' : p.price) };
+  });
+  if (!S.presets.length) S.presets.push(blankPreset());
+}
+normPresets();
 function blankItem(extra) { return { name: '', qty: '1', unit: 'db', price: '', extra: !!extra }; }
 function newDraft() { return { cname: '', caddr: '', cphone: '', cmail: '', desc: '', date: todayISO(), items: [blankItem(false)], pay: 'Készpénz', due: 'átadáskor', note: '', acc: false, sig: '', sigR: 0.3, id: '' }; }
 var D = readJSON('mk_draft', null) || newDraft();
@@ -858,7 +880,8 @@ var saveT;
 function saveDraft() { clearTimeout(saveT); saveT = setTimeout(function () { store.set('mk_draft', JSON.stringify(D)); }, 250); }
 function saveSettings() { store.set('mk_set', JSON.stringify(S)); }
 
-var UNITS = ['db', 'óra', 'm', 'fm', 'm²', 'm³', 'kg', 'klt', 'átalány'];
+var UNITS = ['db', 'óra', 'km', 'm', 'fm', 'm²', 'm³', 'kg', 'klt', 'átalány'];
+function unitList(cur) { return (cur && UNITS.indexOf(cur) < 0) ? UNITS.concat([cur]) : UNITS; }
 function itemTotal(it) { return num(it.qty) * num(it.price); }
 function totals() { var base = 0, extra = 0; D.items.forEach(function (it) { if (it.extra) extra += itemTotal(it); else base += itemTotal(it); }); return { base: base, extra: extra, sum: base + extra }; }
 
@@ -870,14 +893,65 @@ function renderItems() {
       '<label class="first">' + (it.extra ? 'Pótmunka megnevezése' : 'Megnevezés') + '</label>' +
       '<input type="text" data-f="name" value="' + esc(it.name) + '" autocomplete="off">' +
       '<div class="grid3"><div><label>Mennyiség</label><input type="text" inputmode="decimal" data-f="qty" value="' + esc(it.qty) + '"></div>' +
-      '<div><label>Egység</label><select data-f="unit">' + UNITS.map(function (u) { return '<option' + (u === it.unit ? ' selected' : '') + '>' + u + '</option>'; }).join('') + '</select></div>' +
+      '<div><label>Egység</label><select data-f="unit">' + unitList(it.unit).map(function (u) { return '<option' + (u === it.unit ? ' selected' : '') + '>' + esc(u) + '</option>'; }).join('') + '</select></div>' +
       '<div class="wide"><label>Egységár (Ft)</label><input type="text" inputmode="decimal" data-f="price" value="' + esc(it.price) + '"></div></div>' +
       '<div class="itemfoot"><label class="chk"><input type="checkbox" data-f="extra"' + (it.extra ? ' checked' : '') + '> Pótmunka</label><b class="line">' + money(itemTotal(it)) + '</b>' +
       (D.items.length > 1 ? '<button class="link danger" type="button" data-act="del">Törlés</button>' : '') + '</div></div>';
   });
   $('items').innerHTML = h;
+  renderPresetPick();
   renderTotals();
 }
+
+/* ====== gyakori tételek ====== */
+function renderPresetPick() {
+  var box = $('presetBox'), list = S.presets.filter(function (p) { return p.name.trim(); });
+  if (!list.length) { box.hidden = true; box.innerHTML = ''; return; }
+  var h = '<div class="pbox"><b>Gyakori tételeim</b><div class="small">Pipáld ki, ami erre a munkára vonatkozik. A mennyiséget lent, a tétel sorában írhatod át.</div>';
+  list.forEach(function (p) {
+    var on = D.items.some(function (it) { return it.pid === p.id; });
+    var sub = (num(p.price) ? money(num(p.price)) + ' / ' : '') + esc(p.unit);
+    h += '<label class="chk prow"><input type="checkbox" data-pid="' + esc(p.id) + '"' + (on ? ' checked' : '') + '><span>' + esc(p.name) + '<small>' + sub + '</small></span></label>';
+  });
+  box.innerHTML = h + '</div>'; box.hidden = false;
+}
+$('presetBox').addEventListener('change', function (e) {
+  var id = e.target.getAttribute('data-pid'); if (!id) return;
+  var p = S.presets.filter(function (x) { return x.id === id; })[0]; if (!p) return;
+  if (e.target.checked) {
+    if (D.items.length === 1 && !D.items[0].name && !num(D.items[0].price) && !D.items[0].pid) D.items = [];
+    if (!D.items.some(function (it) { return it.pid === id; })) D.items.push({ name: p.name, qty: p.qty || '1', unit: p.unit, price: p.price, extra: false, pid: id });
+  } else {
+    D.items = D.items.filter(function (it) { return it.pid !== id; });
+    if (!D.items.length) D.items.push(blankItem(false));
+  }
+  saveDraft(); renderItems();
+});
+function renderPresetEd() {
+  var h = '';
+  S.presets.forEach(function (p, i) {
+    h += '<div class="item" data-pi="' + i + '">' +
+      '<label class="first">Megnevezés</label><input type="text" data-pf="name" value="' + esc(p.name) + '" placeholder="pl. Kiszállási díj" autocomplete="off">' +
+      '<div class="grid3"><div><label>Alap mennyiség</label><input type="text" inputmode="decimal" data-pf="qty" value="' + esc(p.qty) + '"></div>' +
+      '<div><label>Egység</label><select data-pf="unit">' + unitList(p.unit).map(function (u) { return '<option' + (u === p.unit ? ' selected' : '') + '>' + esc(u) + '</option>'; }).join('') + '</select></div>' +
+      '<div class="wide"><label>Egységár (Ft)</label><input type="text" inputmode="decimal" data-pf="price" value="' + esc(p.price) + '"></div></div>' +
+      '<div class="itemfoot"><button class="link danger" type="button" data-pact="del">Törlés</button></div></div>';
+  });
+  $('presetEd').innerHTML = h;
+}
+$('presetEd').addEventListener('input', function (e) {
+  var f = e.target.getAttribute('data-pf'); if (!f) return;
+  var p = S.presets[Number(e.target.closest('.item').getAttribute('data-pi'))]; if (!p) return;
+  p[f] = e.target.value; saveSettings();
+});
+$('presetEd').addEventListener('click', function (e) {
+  if (e.target.getAttribute('data-pact') !== 'del') return;
+  S.presets.splice(Number(e.target.closest('.item').getAttribute('data-pi')), 1); normPresets(); saveSettings(); renderPresetEd();
+});
+$('presetAdd').addEventListener('click', function () {
+  S.presets.push(blankPreset()); saveSettings(); renderPresetEd();
+  var l = document.querySelectorAll('#presetEd .item'); var last = l[l.length - 1]; if (last) last.querySelector('input').focus();
+});
 function renderTotals() {
   var t = totals(), h = '<div><span>Alapmunka</span><span>' + money(t.base) + '</span></div>';
   if (t.extra > 0) h += '<div><span>Pótmunka</span><span>' + money(t.extra) + '</span></div>';
@@ -893,6 +967,7 @@ function fillForm() {
 }
 function fillSettings() {
   document.querySelectorAll('[data-s]').forEach(function (el) { el.value = S[el.getAttribute('data-s')] || ''; });
+  renderPresetEd();
 }
 
 document.querySelectorAll('[data-d]').forEach(function (el) {
@@ -949,7 +1024,7 @@ $('btnSettings').addEventListener('click', function () { fillSettings(); renderG
 $('settingsDone').addEventListener('click', function () { saveSettings(); show('viewHome'); });
 $('homeSet').addEventListener('click', function () { $('btnSettings').click(); });
 $('clauseReset').addEventListener('click', function () { S.clause = DEF_CLAUSE; saveSettings(); fillSettings(); toast('Alapszöveg visszaállítva.'); });
-$('wipe').addEventListener('click', function () { if (confirm('Biztosan törlöd a mentett vázlatot és a beállításokat? A licenc és a próbaidő nem törlődik.')) { store.del('mk_draft'); store.del('mk_set'); S = { name: '', taxid: '', phone: '', addr: '', email: '', bank: '', clause: DEF_CLAUSE }; D = newDraft(); fillSettings(); fillForm(); toast('Törölve.'); } });
+$('wipe').addEventListener('click', function () { if (confirm('Biztosan törlöd a mentett vázlatot és a beállításokat? A licenc és a próbaidő nem törlődik.')) { store.del('mk_draft'); store.del('mk_set'); S = { name: '', taxid: '', phone: '', addr: '', email: '', bank: '', clause: DEF_CLAUSE, presets: [] }; normPresets(); D = newDraft(); fillSettings(); fillForm(); toast('Törölve.'); } });
 
 $('finish').addEventListener('click', function () {
   if (!D.cname.trim()) { toast('Add meg a megrendelő nevét.'); $('cname').focus(); return; }
@@ -1115,7 +1190,7 @@ function markSent() {
 }
 
 /* ====== adatmentés és visszaállítás ====== */
-var APP_VERSION = '2.3 (2026-10-30)';
+var APP_VERSION = '2.4 (2026-11-02)';
 $('verInfo').textContent = APP_VERSION;
 function bkStatus(t, k) { var e = $('bkStatus'); e.hidden = !t; e.className = 'status' + (k ? ' ' + k : ''); e.textContent = t || ''; }
 function bkLastShow() { var t = Number(store.get('mk_lastbk')) || 0; $('bkLast').textContent = t ? 'Utolsó mentés: ' + new Date(t).toLocaleString('hu-HU') : 'Még nem volt mentés.'; }
