@@ -94,12 +94,22 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 #lock textarea{min-height:96px;font-size:15px}
 .hr{height:1px;background:var(--line);margin:14px 0}
 .small{font-size:14px;color:var(--mut)}
+.logo.own{background:#fff;padding:2px;overflow:hidden}
+.logo.own img{max-width:100%;max-height:100%;display:block}
+.lgprev{display:flex;align-items:center;margin:10px 0}
+.lgprev .lgbox{width:64px;height:64px;border-radius:12px;background:var(--navy);display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden;padding:6px}
+.lgprev .lgbox img{max-width:100%;max-height:100%;display:block;background:#fff;border-radius:6px}
+.lgprev .small{margin-left:12px}
+.by{display:flex;align-items:center;margin-top:10px;font-size:11px;color:var(--mut);opacity:.85}
+.by img{width:18px;height:18px;border-radius:4px;margin-right:6px}
+.shp{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.shp a,.shp button{flex:1 1 40%;display:flex;align-items:center;justify-content:center;min-height:48px;padding:8px 10px;border-radius:12px;border:2px solid var(--navy);background:#fff;color:var(--navy);font:inherit;font-size:16px;font-weight:700;text-decoration:none;cursor:pointer}
 </style>
 </head>
 <body>
 <div id="appRoot" hidden>
 <header class="top">
-  <div class="brand"><span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#0b2447" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg></span>Munkalap</div>
+  <div class="brand"><span class="logo" id="brandLogo"><svg viewBox="0 0 24 24" fill="none" stroke="#0b2447" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg></span>Munkalap</div>
   <span id="badge" class="badge" hidden></span>
   <button id="btnList" class="tbtn" type="button">Kezdőlap</button>
   <button id="btnSettings" class="tbtn" type="button">Beállítások</button>
@@ -117,6 +127,17 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
     <button id="homeNew" class="btn dark" type="button">Új munkalap</button>
     <button id="homeList" class="btn sec" type="button">Mentett munkalapok</button>
     <button id="homeSet" class="btn sec" type="button">Beállítások</button>
+    <button id="homeShare" class="btn sec" type="button" style="margin-top:10px">Ajánld tovább egy kollégának</button>
+    <div id="shPanel" class="card" hidden style="margin-top:12px">
+      <div class="small">Ismersz valakit, akinek hasznos lehet? Küldd el neki a bemutató oldal linkjét (4 napig ingyen kipróbálható).</div>
+      <div class="shp">
+        <a id="shWa" target="_blank" rel="noopener">WhatsApp</a>
+        <a id="shVi" target="_blank" rel="noopener">Viber</a>
+        <a id="shFb" target="_blank" rel="noopener">Facebook</a>
+        <a id="shMail">E-mail</a>
+        <button id="shCopy" type="button">Link másolása</button>
+      </div>
+    </div>
   </section>
 
   <!-- ŰRLAP -->
@@ -228,6 +249,14 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
       <button id="presetAdd" class="btn sec" type="button">+ Új gyakori tétel</button>
     </div>
     <div class="card">
+      <h2>Saját logó</h2>
+      <div class="small">Ide töltheted fel a saját logódat. Megjelenik az app tetején és a PDF munkalap fejlécében. Kép (PNG vagy JPG) legyen, a legjobb a négyzet alakú.</div>
+      <div class="lgprev"><div class="lgbox"><img id="lgImg" alt="" hidden><span id="lgNone" class="small" style="color:#fff">nincs</span></div><div id="lgInfo" class="small"></div></div>
+      <button id="lgPick" class="btn sec" type="button">Logó kiválasztása</button>
+      <button id="lgDel" class="link danger" type="button" hidden>Saját logó törlése</button>
+      <input id="lgFile" type="file" accept="image/png,image/jpeg,image/webp,image/*" hidden>
+    </div>
+    <div class="card">
       <h2>Szerződéses szöveg</h2>
       <div class="small">Ez a szöveg szerepel a munkalapon és a megrendelő ezt fogadja el. Átírhatod a saját igényeid szerint.</div>
       <textarea id="sclause" data-s="clause" style="min-height:200px;margin-top:10px"></textarea>
@@ -255,6 +284,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
       <div id="bkStatus" class="status" hidden></div>
       <div class="hr"></div>
       <div class="small">Verzió: <span id="verInfo"></span></div>
+      <div class="by"><img alt="" src="data:image/png;base64,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">Balazs - Digital</div>
       <button id="wipe" class="link danger" type="button">Beállítások és a félbehagyott vázlat törlése (a lezárt munkalapok megmaradnak)</button>
     </div>
     <button id="settingsDone" class="btn dark" type="button">Mentés és vissza</button>
@@ -1020,11 +1050,61 @@ window.addEventListener('resize', function () { if (!$('viewForm').hidden) sizeC
 
 /* ====== nézetek ====== */
 function show(v) { ['viewHome', 'viewForm', 'viewDone', 'viewSettings', 'viewList'].forEach(function (id) { $(id).hidden = (id !== v); }); window.scrollTo(0, 0); try { sessionStorage.setItem('mk_view', v); sessionStorage.setItem('mk_scroll', '0'); } catch (e) {} if (v === 'viewHome') renderHome(); if (v === 'viewForm') { fillForm(); setTimeout(sizeCanvas, 30); } }
+/* ====== saját logó ====== */
+function renderLogo() {
+  var has = typeof S.logo === 'string' && S.logo.indexOf('data:image/') === 0, bl = $('brandLogo');
+  if (has) { bl.className = 'logo own'; bl.innerHTML = '<img alt="" src="' + S.logo + '">'; }
+  else { bl.className = 'logo'; bl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#0b2447" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>'; }
+  $('lgImg').hidden = !has; $('lgNone').hidden = has; $('lgDel').hidden = !has;
+  if (has) $('lgImg').src = S.logo;
+  $('lgInfo').textContent = has ? 'A saját logód be van állítva.' : 'Most az alap jelölés látszik.';
+}
+$('lgPick').addEventListener('click', function () { $('lgFile').click(); });
+$('lgFile').addEventListener('change', function () {
+  var f = this.files && this.files[0]; this.value = ''; if (!f) return;
+  if (!/^image\//.test(f.type)) { toast('Ez nem képfájl. PNG vagy JPG kell.'); return; }
+  var r = new FileReader();
+  r.onload = function () {
+    var im = new Image();
+    im.onload = function () {
+      var m = 256, k = Math.min(1, m / Math.max(im.width, im.height)), w = Math.max(1, Math.round(im.width * k)), h = Math.max(1, Math.round(im.height * k));
+      var c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(im, 0, 0, w, h);
+      S.logo = c.toDataURL('image/png'); S.logoR = w / h; saveSettings(); renderLogo(); toast('A logó beállítva.');
+    };
+    im.onerror = function () { toast('A képet nem sikerült megnyitni.'); };
+    im.src = r.result;
+  };
+  r.readAsDataURL(f);
+});
+$('lgDel').addEventListener('click', function () { delete S.logo; delete S.logoR; saveSettings(); renderLogo(); toast('A saját logó törölve.'); });
+renderLogo();
+
+/* ====== ajánld tovább ====== */
+(function () {
+  var base = 'https://balazs-digital.systeme.io/munkalap', text = 'Szakember Munkalap: telefonos munkalap vállalkozóknak, ujjal aláírással és kész PDF-fel. 4 napig ingyen kipróbálható:';
+  function link(s) { return base + '?utm_source=megosztas&utm_medium=' + s; }
+  function enc(s) { return encodeURIComponent(s); }
+  $('shWa').href = 'https://wa.me/?text=' + enc(text + ' ' + link('app_whatsapp'));
+  $('shVi').href = 'viber://forward?text=' + enc(text + ' ' + link('app_viber'));
+  $('shFb').href = 'https://www.facebook.com/sharer/sharer.php?u=' + enc(link('app_facebook'));
+  $('shMail').href = 'mailto:?subject=' + enc('Szakember Munkalap – telefonos munkalap vállalkozóknak') + '&body=' + enc(text + '\n\n' + link('app_email'));
+  function copy() {
+    var u = link('app_link');
+    function fb() { var t = document.createElement('textarea'); t.value = u; t.style.position = 'fixed'; t.style.opacity = '0'; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(t); toast('A link a vágólapra került.'); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(u).then(function () { toast('A link a vágólapra került.'); }, fb); else fb();
+  }
+  $('shCopy').addEventListener('click', copy);
+  $('homeShare').addEventListener('click', function () {
+    if (navigator.share) { navigator.share({ title: 'Szakember Munkalap', text: text, url: link('app_megosztomenu') }).catch(function () {}); return; }
+    $('shPanel').hidden = !$('shPanel').hidden;
+  });
+})();
+
 $('btnSettings').addEventListener('click', function () { fillSettings(); renderGate(); show('viewSettings'); });
 $('settingsDone').addEventListener('click', function () { saveSettings(); show('viewHome'); });
 $('homeSet').addEventListener('click', function () { $('btnSettings').click(); });
 $('clauseReset').addEventListener('click', function () { S.clause = DEF_CLAUSE; saveSettings(); fillSettings(); toast('Alapszöveg visszaállítva.'); });
-$('wipe').addEventListener('click', function () { if (confirm('Biztosan törlöd a mentett vázlatot és a beállításokat? A licenc és a próbaidő nem törlődik.')) { store.del('mk_draft'); store.del('mk_set'); S = { name: '', taxid: '', phone: '', addr: '', email: '', bank: '', clause: DEF_CLAUSE, presets: [] }; normPresets(); D = newDraft(); fillSettings(); fillForm(); toast('Törölve.'); } });
+$('wipe').addEventListener('click', function () { if (confirm('Biztosan törlöd a mentett vázlatot és a beállításokat? A licenc és a próbaidő nem törlődik.')) { store.del('mk_draft'); store.del('mk_set'); S = { name: '', taxid: '', phone: '', addr: '', email: '', bank: '', clause: DEF_CLAUSE, presets: [] }; normPresets(); D = newDraft(); fillSettings(); fillForm(); renderLogo(); toast('Törölve.'); } });
 
 $('finish').addEventListener('click', function () {
   if (!D.cname.trim()) { toast('Add meg a megrendelő nevét.'); $('cname').focus(); return; }
@@ -1105,7 +1185,9 @@ function buildPdf() {
   var t = totals();
 
   doc.setFillColor(11, 36, 71); doc.rect(0, 0, W, 30, 'F'); doc.setFillColor(255, 195, 0); doc.rect(0, 30, W, 2, 'F');
-  font(true, 22, [255, 255, 255]); doc.text('MUNKALAP', M, 19);
+  var hx = M;
+  if (S.logo && String(S.logo).indexOf('data:image/') === 0) { try { var lr = S.logoR || 1, lh = 20, lw = lh * lr; if (lw > 40) { lw = 40; lh = lw / lr; } doc.setFillColor(255, 255, 255); doc.roundedRect(M, 5, lw + 4, lh + 4, 2, 2, 'F'); doc.addImage(S.logo, 'PNG', M + 2, 7, lw, lh); hx = M + lw + 9; } catch (e) { hx = M; } }
+  font(true, 22, [255, 255, 255]); doc.text('MUNKALAP', hx, 19);
   font(false, 10, [255, 255, 255]); doc.text('Sorszám: ' + id, W - M, 15, { align: 'right' }); doc.text('Dátum: ' + huDate(D.date), W - M, 21, { align: 'right' });
   y = 42;
 
@@ -1190,7 +1272,7 @@ function markSent() {
 }
 
 /* ====== adatmentés és visszaállítás ====== */
-var APP_VERSION = '2.4 (2026-11-02)';
+var APP_VERSION = '2.5 (2026-11-11)';
 $('verInfo').textContent = APP_VERSION;
 function bkStatus(t, k) { var e = $('bkStatus'); e.hidden = !t; e.className = 'status' + (k ? ' ' + k : ''); e.textContent = t || ''; }
 function bkLastShow() { var t = Number(store.get('mk_lastbk')) || 0; $('bkLast').textContent = t ? 'Utolsó mentés: ' + new Date(t).toLocaleString('hu-HU') : 'Még nem volt mentés.'; }
