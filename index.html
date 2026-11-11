@@ -8,8 +8,8 @@
 <meta name="robots" content="noindex">
 <title>Munkalap</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png?v=3">
+<link rel="apple-touch-icon" href="icon-192.png?v=3">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <style>
@@ -22,8 +22,8 @@ body{-webkit-tap-highlight-color:transparent;margin:0;background:var(--bg);color
 .top>*{margin:4px 5px}
 .logo{margin-right:8px}
 .brand{font-weight:800;font-size:19px;display:flex;align-items:center;flex:1 0 auto;min-width:0}
-.logo{width:28px;height:28px;border-radius:7px;background:var(--yellow);display:inline-flex;align-items:center;justify-content:center}
-.logo svg{width:18px;height:18px}
+.logo{width:28px;height:28px;border-radius:7px;background:transparent;display:inline-flex;align-items:center;justify-content:center}
+.logo svg{width:28px;height:28px}
 .badge{font-size:12px;font-weight:700;background:var(--navy2);color:var(--yellow);border-radius:20px;padding:5px 10px;white-space:nowrap}
 .badge.ok{background:#1a7f37;color:#fff}
 .tbtn{flex:none;background:transparent;border:2px solid #ffffff55;color:#fff;border-radius:10px;font:inherit;font-size:15px;font-weight:700;padding:8px 12px;min-height:44px}
@@ -109,7 +109,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
 <body>
 <div id="appRoot" hidden>
 <header class="top">
-  <div class="brand"><span class="logo" id="brandLogo"><svg viewBox="0 0 24 24" fill="none" stroke="#0b2447" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg></span>Munkalap</div>
+  <div class="brand"><span class="logo" id="brandLogo"><svg viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="112" fill="#0b2447"/><path d="M130 96h170l82 82v238a24 24 0 0 1-24 24H130a24 24 0 0 1-24-24V120a24 24 0 0 1 24-24z" fill="#ffffff"/><path d="M300 96v58a24 24 0 0 0 24 24h58z" fill="#c9d3e6"/><rect x="146" y="206" width="150" height="18" rx="9" fill="#19376d"/><rect x="146" y="248" width="200" height="18" rx="9" fill="#19376d" opacity=".5"/><rect x="146" y="290" width="110" height="18" rx="9" fill="#19376d" opacity=".5"/><path d="M146 372c26-40 38-40 46-14s22 24 34-4 24-14 36 2" fill="none" stroke="#0b2447" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><g transform="translate(372 318) rotate(40)"><rect x="-26" y="-130" width="52" height="170" rx="6" fill="#ffc300"/><rect x="-26" y="-130" width="52" height="28" rx="6" fill="#e8edf6"/><path d="M-26 40h52l-26 54z" fill="#f3d7b0"/><path d="M-9 76h18l-9 18z" fill="#0b2447"/></g></svg></span>Munkalap</div>
   <span id="badge" class="badge" hidden></span>
   <button id="btnList" class="tbtn" type="button">Kezdőlap</button>
   <button id="btnSettings" class="tbtn" type="button">Beállítások</button>
@@ -284,7 +284,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);b
       <div id="bkStatus" class="status" hidden></div>
       <div class="hr"></div>
       <div class="small">Verzió: <span id="verInfo"></span></div>
-      <div class="by"><img alt="" src="data:image/png;base64,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">Balazs - Digital</div>
+      <div class="by"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAEkElEQVR4AeyYC0wTdxzHrwVqsUCBMsarsqkwupg51LEoMBdJGERtptmMBqbEbAILYQ8Fx8TgnPLINkdAVtHMB1nnsIhdIoPIfGzsYUHAKKioSdXwECglQMujrVf/cHg9rufd/05rNCn58u/v/3v9P/fnz11bvmj+e8+V+Mhz9uMEYvqDOHfIuUNMO8AUf9HO0JrE2IZTpYZbdax04mAhn8/xUhnKdn6+KXJBGNM2k+NBQUEnf/6OGxMdUPjcECDyanBzsbcvNyY6oN7+QbjVqbMwJurY4710QI+vgo0Apl8V+bDZU3mOBQJLBAQEsmJyCJBE7A5QcLFicghQgJ8o2N/TSyTwfKSweaFlhdk4Io3hECA3V36wv0fEqxIZQZGyUBoOPOQQILw7BwMWqG9gOCXr4Nr0EkadqNEwcvB41paq9NP7VyOIlZQMC3SnU3emoe1i621G/aW5QVrDflpVGCWWxsve2txcleo1ewbDjIl9Je6JWji3+2IJjMp2b8KrKI2k6K640BqepR9EvaWJmupcfx83YGOCBcKyn3xcFj5YltLuOtYq0b7jMnETNBSIX18Y5gkMTLBAI8Zx9ZnmyhoNK1XVNoHDh60ExmCfscrMFldXK7BdzHcl2uXC4ZNHyrfXN+qBBxMskMlkudc90NmjZ6Wu3kFQOL2S1aje1uwjsmBTMPLQoXJF3p6jd4GNCxZI4uORmRK/9eNEVvosJT4k0HdqMWvoSIYsyDhlTw/qppd3V5Pf28ACTffg/HInx9PSQKxu0XptPvQG0YPZsED0Z+jsf9ewdtSjToV0FhFDXXrhmn2LTWaK1SlcxMope3IAR4HmDPXphiaTKH8NTUjHR8SIcdxF/v3iAYOA6MRtWCD6M7RBvhTvOMMw9SDtKxHrBO5EUWTD/jc7ejxwD8mABSKVQU2tZqQtATFP3gDx/O3HI861++FTe4MdUFuH9sPUvFO1tuOpOn0hPDa5oFSJgmuf2d6ku/6AH0j0HTonVfzJ8MxnAXTh/8sx72eI3IVpX/1wv2/yVtbbr8/YUZyVtv6Yqi57zwHi2sC2GAbGhJ9axBuBDWR0e3urUgYMesECdd/XbczcW7Qj9Whxjjw+WlHxO+j7bXHFiuhFnyStUh/eW3teMzpmOysIakYnhsHDfNxtrdlvF+IeofU4gKI8UEUvWKD0r39ctmRBarIctNuWtr5CVVd6pPq4+mxBzhbgiZg/p/38sdnus4CNSd/XiRkIj/9ALEcir6A82wNrOkT1Agu0JWnVTwVfYh1emyfdtyvj38arqvJvXpEGYE7SmF+qLFI2C16Sge8LhYGRCN/2PCdlkqawQCvjlvp62y4RfMT+TZG3ImYRqR0+XZ3wbu7OXIEknOdCfb/BM0kGLBCpjHG6PDZmloAdCtbTUUBYdw4jHdDQiBH79+bQ177kpvbRMbePETx0QCDtcOUfZrPtHQzwcJNxdFxZXQ9TywCUX/LLnKh1CUlZicnZnBW37ouQJR/U/33pKQCBFiOG0X8arzZornCWpvU6/DYz7BAAesZyAjFtuHOHmHboIQAAAP//Z8e8uAAAAAZJREFUAwCrU6+fC91LcAAAAABJRU5ErkJggg==">Balazs - Digital</div>
       <button id="wipe" class="link danger" type="button">Beállítások és a félbehagyott vázlat törlése (a lezárt munkalapok megmaradnak)</button>
     </div>
     <button id="settingsDone" class="btn dark" type="button">Mentés és vissza</button>
@@ -1051,10 +1051,11 @@ window.addEventListener('resize', function () { if (!$('viewForm').hidden) sizeC
 /* ====== nézetek ====== */
 function show(v) { ['viewHome', 'viewForm', 'viewDone', 'viewSettings', 'viewList'].forEach(function (id) { $(id).hidden = (id !== v); }); window.scrollTo(0, 0); try { sessionStorage.setItem('mk_view', v); sessionStorage.setItem('mk_scroll', '0'); } catch (e) {} if (v === 'viewHome') renderHome(); if (v === 'viewForm') { fillForm(); setTimeout(sizeCanvas, 30); } }
 /* ====== saját logó ====== */
+var DEFMARK = '<svg viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="112" fill="#0b2447"/><path d="M130 96h170l82 82v238a24 24 0 0 1-24 24H130a24 24 0 0 1-24-24V120a24 24 0 0 1 24-24z" fill="#ffffff"/><path d="M300 96v58a24 24 0 0 0 24 24h58z" fill="#c9d3e6"/><rect x="146" y="206" width="150" height="18" rx="9" fill="#19376d"/><rect x="146" y="248" width="200" height="18" rx="9" fill="#19376d" opacity=".5"/><rect x="146" y="290" width="110" height="18" rx="9" fill="#19376d" opacity=".5"/><path d="M146 372c26-40 38-40 46-14s22 24 34-4 24-14 36 2" fill="none" stroke="#0b2447" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><g transform="translate(372 318) rotate(40)"><rect x="-26" y="-130" width="52" height="170" rx="6" fill="#ffc300"/><rect x="-26" y="-130" width="52" height="28" rx="6" fill="#e8edf6"/><path d="M-26 40h52l-26 54z" fill="#f3d7b0"/><path d="M-9 76h18l-9 18z" fill="#0b2447"/></g></svg>';
 function renderLogo() {
   var has = typeof S.logo === 'string' && S.logo.indexOf('data:image/') === 0, bl = $('brandLogo');
   if (has) { bl.className = 'logo own'; bl.innerHTML = '<img alt="" src="' + S.logo + '">'; }
-  else { bl.className = 'logo'; bl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#0b2447" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>'; }
+  else { bl.className = 'logo'; bl.innerHTML = DEFMARK; }
   $('lgImg').hidden = !has; $('lgNone').hidden = has; $('lgDel').hidden = !has;
   if (has) $('lgImg').src = S.logo;
   $('lgInfo').textContent = has ? 'A saját logód be van állítva.' : 'Most az alap jelölés látszik.';
@@ -1272,7 +1273,7 @@ function markSent() {
 }
 
 /* ====== adatmentés és visszaállítás ====== */
-var APP_VERSION = '2.5 (2026-11-11)';
+var APP_VERSION = '2.7 (2026-11-11)';
 $('verInfo').textContent = APP_VERSION;
 function bkStatus(t, k) { var e = $('bkStatus'); e.hidden = !t; e.className = 'status' + (k ? ' ' + k : ''); e.textContent = t || ''; }
 function bkLastShow() { var t = Number(store.get('mk_lastbk')) || 0; $('bkLast').textContent = t ? 'Utolsó mentés: ' + new Date(t).toLocaleString('hu-HU') : 'Még nem volt mentés.'; }
