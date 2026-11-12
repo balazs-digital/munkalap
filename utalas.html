@@ -16,6 +16,7 @@ input:focus{outline:2px solid #fdc300;border-color:#0b2447}
 .row{display:grid;grid-template-columns:1fr 2fr;gap:12px}
 .chk{display:flex;gap:10px;align-items:flex-start;margin:20px 0 4px;font-size:14px;font-weight:400}
 .chk input{margin-top:4px;width:18px;height:18px;flex:none}
+.note{font-size:13px;color:#51607a;margin:4px 0 0 28px}
 button,.pick{display:block;width:100%;margin-top:10px;padding:14px;border:0;border-radius:8px;background:#0d2748;color:#fff;font-weight:700;font-size:16px;cursor:pointer;text-align:center;text-decoration:none;font-family:inherit}
 button.main{margin-top:18px;font-size:17px;padding:15px}
 .pick.alt{background:#fff;color:#0b2447;border:1px solid #0b2447}
@@ -48,7 +49,8 @@ button.main{margin-top:18px;font-size:17px;padding:15px}
     <input id="ceg" type="text" autocomplete="organization">
     <label for="ado">Adószám <small>(ha cégként vásárolsz)</small></label>
     <input id="ado" type="text">
-    <label class="chk"><input id="aszf" type="checkbox" required><span>Elfogadom az <a href="aszf.html#aszf" target="_blank" rel="noopener">Általános szerződési feltételeket</a> és az <a href="aszf.html#adat" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>, és kérem a teljesítés azonnali megkezdését.</span></label>
+    <label class="chk"><input id="aszf" type="checkbox" required><span>Elfogadom az <a href="https://balazs-digital.systeme.io/apps#aszf" target="_blank" rel="noopener">ÁSZF-et</a> és az <a href="https://balazs-digital.systeme.io/apps#adatkezeles" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>. Kérem a licenckód azonnali elküldését, és tudomásul veszem, hogy a kód kiküldése után az elállási jog megszűnik.</span></label>
+    <p class="note">Ez a törvényes szavatossági jogaidat, például hibás működés esetén, nem érinti.</p>
     <button type="submit" class="main">Tovább</button>
   </form>
 </div>
@@ -67,7 +69,7 @@ button.main{margin-top:18px;font-size:17px;padding:15px}
   <button type="button" class="back" id="vissza">← Vissza az adatokhoz</button>
 </div>
 
-<div class="foot">Balazs - Digital · <a href="aszf.html">ÁSZF és adatkezelés</a></div>
+<div class="foot">Balazs - Digital · <a href="https://balazs-digital.systeme.io/apps#aszf" target="_blank" rel="noopener">ÁSZF és adatkezelés</a></div>
 </div>
 <script>
 (function(){
@@ -86,7 +88,7 @@ function build(){
   'Cím: '+v('irsz')+' '+v('telep')+', '+v('utca')];
   if(v('ceg'))l.push('Cég neve: '+v('ceg'));
   if(v('ado'))l.push('Adószám: '+v('ado'));
-  l.push('','Elfogadom az Általános szerződési feltételeket (https://balazs-digital.github.io/munkalap/aszf.html), és kérem a teljesítés azonnali megkezdését.');
+  l.push('','Elfogadom az ÁSZF-et (https://balazs-digital.systeme.io/apps#aszf) és az adatkezelési tájékoztatót (https://balazs-digital.systeme.io/apps#adatkezeles). Kérem a licenckód azonnali elküldését, és tudomásul veszem, hogy a kód kiküldése után az elállási jog megszűnik.');
   return l.join('\n');
 }
 function links(){
