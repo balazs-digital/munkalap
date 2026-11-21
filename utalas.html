@@ -49,7 +49,7 @@ button.main{margin-top:18px;font-size:17px;padding:15px}
     <input id="ceg" type="text" autocomplete="organization">
     <label for="ado">Adószám <small>(ha cégként vásárolsz)</small></label>
     <input id="ado" type="text">
-    <label class="chk"><input id="aszf" type="checkbox" required><span>Elfogadom az <a href="https://balazs-digital.systeme.io/apps#aszf" target="_blank" rel="noopener">ÁSZF-et</a> és az <a href="https://balazs-digital.systeme.io/apps#adatkezeles" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>. Kérem a licenckód azonnali elküldését, és tudomásul veszem, hogy a kód kiküldése után az elállási jog megszűnik.</span></label>
+    <label class="chk"><input id="aszf" type="checkbox" required><span>Elfogadom az <a href="https://www.balazsdigital.hu/apps#aszf" target="_blank" rel="noopener">ÁSZF-et</a> és az <a href="https://www.balazsdigital.hu/apps#adatkezeles" target="_blank" rel="noopener">adatkezelési tájékoztatót</a>. Kérem a licenckód azonnali elküldését, és tudomásul veszem, hogy a kód kiküldése után az elállási jog megszűnik.</span></label>
     <p class="note">Ez a törvényes szavatossági jogaidat, például hibás működés esetén, nem érinti.</p>
     <button type="submit" class="main">Tovább</button>
   </form>
@@ -69,7 +69,7 @@ button.main{margin-top:18px;font-size:17px;padding:15px}
   <button type="button" class="back" id="vissza">← Vissza az adatokhoz</button>
 </div>
 
-<div class="foot">Balazs - Digital · <a href="https://balazs-digital.systeme.io/apps#aszf" target="_blank" rel="noopener">ÁSZF és adatkezelés</a></div>
+<div class="foot">Balazs - Digital · <a href="https://www.balazsdigital.hu/apps#aszf" target="_blank" rel="noopener">ÁSZF és adatkezelés</a></div>
 </div>
 <script>
 (function(){
@@ -88,7 +88,7 @@ function build(){
   'Cím: '+v('irsz')+' '+v('telep')+', '+v('utca')];
   if(v('ceg'))l.push('Cég neve: '+v('ceg'));
   if(v('ado'))l.push('Adószám: '+v('ado'));
-  l.push('','Elfogadom az ÁSZF-et (https://balazs-digital.systeme.io/apps#aszf) és az adatkezelési tájékoztatót (https://balazs-digital.systeme.io/apps#adatkezeles). Kérem a licenckód azonnali elküldését, és tudomásul veszem, hogy a kód kiküldése után az elállási jog megszűnik.');
+  l.push('','Elfogadom az ÁSZF-et (https://www.balazsdigital.hu/apps#aszf) és az adatkezelési tájékoztatót (https://www.balazsdigital.hu/apps#adatkezeles). Kérem a licenckód azonnali elküldését, és tudomásul veszem, hogy a kód kiküldése után az elállási jog megszűnik.');
   return l.join('\n');
 }
 function links(){
